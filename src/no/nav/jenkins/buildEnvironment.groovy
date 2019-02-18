@@ -1,4 +1,4 @@
-
+package no.nav.jenkins
 
 def setEnv() {
     env.LANG = "nb_NO.UTF-8"
