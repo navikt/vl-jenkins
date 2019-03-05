@@ -14,9 +14,9 @@ def overrideJDK(String targetJDK) {
     //Override default JDK
     switch(targetJDK) {
 
-        case "11": env.JAVA_HOME = "${tool 'java-11'}"
+        case "11": env.JAVA_HOME = "${tool '11'}"
             break
-        case "10": env.JAVA_HOME = "${tool 'java-10'}"
+        case "10": env.JAVA_HOME = "${tool '10'}"
             break
         case "1.8": env.JAVA_HOME = "${tool 'jdk-1.8'}"
             break
