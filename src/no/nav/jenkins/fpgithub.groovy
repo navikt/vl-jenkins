@@ -1,6 +1,6 @@
 package no.nav.jenkins
 
-def updateBuildStatus(String application, String status, String commitSHA) {
+def updateBuildStatus(String githubRepoName, String status, String commitSHA) {
     GITHUB_APP_ID = "20250"
     checkout([
                         $class: 'GitSCM',
@@ -17,7 +17,7 @@ def updateBuildStatus(String application, String status, String commitSHA) {
         GH_TOKEN = sh (script: "vl-jenkins/bin/generate-installation-token.sh $JWT_TOKEN", returnStdout: true)
         //echo ("GH_TOKEN $GH_TOKEN");
     }
-    sh "curl --proxy http://webproxy-internett.nav.no:8088 -H \"Content-Type: application/json\" -X POST -d '{\"state\": \"$status\", \"context\": \"continuous-integration/jenkins\", \"description\": \"Jenkins\", \"target_url\": \"${env.BUILD_URL}\"}' https://api.github.com/repos/navikt/$application/statuses/$commitSHA?access_token=$GH_TOKEN"
+    sh "curl --proxy http://webproxy-internett.nav.no:8088 -H \"Content-Type: application/json\" -X POST -d '{\"state\": \"$status\", \"context\": \"continuous-integration/jenkins\", \"description\": \"Jenkins\", \"target_url\": \"${env.BUILD_URL}\"}' https://api.github.com/repos/navikt/$githubRepoName/statuses/$commitSHA?access_token=$GH_TOKEN"
 }
 
 return this
