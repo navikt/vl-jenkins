@@ -49,7 +49,7 @@ def call() {
                                 buildEnvironment.overrideJDK(maven.javaVersion())
                             }
 
-                            sh "mvn -B -s -Dfile.encoding=UTF-8 -DinstallAtEnd=true -DdeployAtEnd=true -Dsha1= -Dchangelist= -Drevision=$version clean install"
+                            sh "mvn -B -Dfile.encoding=UTF-8 -DinstallAtEnd=true -DdeployAtEnd=true -Dsha1= -Dchangelist= -Drevision=$version clean install"
                             sh "docker build --pull -t $dockerRegistryIapp/$artifactId:$version ."
                             withCredentials([[$class          : 'UsernamePasswordMultiBinding',
                                               credentialsId   : 'nexusUser',
