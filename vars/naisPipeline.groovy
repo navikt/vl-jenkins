@@ -4,7 +4,7 @@ def call() {
     def maven = new maven()
     def fpgithub = new fpgithub()
     def version
-    def artifactId
+    def githubRepoName
     def GIT_COMMIT_HASH_FULL
 
     pipeline {
@@ -24,13 +24,13 @@ def call() {
                         changelist = "_" + date.format("YYYYMMDDHHmmss") + "_" + gitCommitHasdh
                         mRevision = maven.revision()
                         version = mRevision + changelist
-                        artifactId = sh(script: "basename `git rev-parse --show-toplevel`", returnStdout: true)
+                        githubRepoName = sh(script: "basename `git rev-parse --show-toplevel`", returnStdout: true)
 
                         currentBuild.displayName = version
 
                         echo "Building $version"
 
-                        fpgithub.updateBuildStatus(artifactId, "pending", GIT_COMMIT_HASH_FULL)
+                        fpgithub.updateBuildStatus(githubRepoName, "pending", GIT_COMMIT_HASH_FULL)
 
                     }
                 }
@@ -79,12 +79,12 @@ def call() {
         post {
             success {
                 script {
-                    fpgithub.updateBuildStatus(artifactId, "success", GIT_COMMIT_HASH_FULL)
+                    fpgithub.updateBuildStatus(githubRepoName, "success", GIT_COMMIT_HASH_FULL)
                 }
             }
             failure {
                 script {
-                    fpgithub.updateBuildStatus(artifactId, "failure", GIT_COMMIT_HASH_FULL)
+                    fpgithub.updateBuildStatus(githubRepoName, "failure", GIT_COMMIT_HASH_FULL)
                 }
             }
         }
