@@ -29,6 +29,9 @@ def call() {
                         currentBuild.displayName = version
 
                         echo "Building $version"
+
+                        fpgithub.updateBuildStatus(artifactId, "pending", GIT_COMMIT_HASH_FULL)
+
                     }
                 }
             }
