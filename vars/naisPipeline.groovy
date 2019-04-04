@@ -33,17 +33,23 @@ def call() {
                 }
             }
 
+            stage('Maven version') {
+                steps {
+                    sh "mvn --version"
+                }
+            }
+
             stage('Build') {
                 steps {
                     script {
-                        wirhMaven (mavenSettingsConfig: 'navMavenSettings') {
+                        withMaven (mavenSettingsConfig: 'navMavenSettings') {
                             buildEnvironment = new buildEnvironment()
 
                             if (maven.javaVersion() != null) {
                                 buildEnvironment.overrideJDK(maven.javaVersion())
                             }
 
-                            sh "mvn -U -B -s $MAVEN_SETTINGS -Dfile.encoding=UTF-8 -DinstallAtEnd=true -DdeployAtEnd=true -Dsha1= -Dchangelist= -Drevision=$version clean install"
+                            sh "mvn -B -s -Dfile.encoding=UTF-8 -DinstallAtEnd=true -DdeployAtEnd=true -Dsha1= -Dchangelist= -Drevision=$version clean install"
                             sh "docker build --pull -t $dockerRegistryIapp/$artifactId:$version ."
                             withCredentials([[$class          : 'UsernamePasswordMultiBinding',
                                               credentialsId   : 'nexusUser',
@@ -70,12 +76,12 @@ def call() {
         post {
             success {
                 script {
-                    fpgithub.updateBuildStatus("fp-abakus", "success", GIT_COMMIT_HASH_FULL)
+                    fpgithub.updateBuildStatus(artifactId, "success", GIT_COMMIT_HASH_FULL)
                 }
             }
             failure {
                 script {
-                    fpgithub.updateBuildStatus("fp-abakus", "failure", GIT_COMMIT_HASH_FULL)
+                    fpgithub.updateBuildStatus(artifactId, "failure", GIT_COMMIT_HASH_FULL)
                 }
             }
         }
