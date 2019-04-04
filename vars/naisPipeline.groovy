@@ -24,7 +24,7 @@ def call() {
                         changelist = "_" + date.format("YYYYMMDDHHmmss") + "_" + gitCommitHasdh
                         mRevision = maven.revision()
                         version = mRevision + changelist
-                        artifactId = maven.artifactId()
+                        artifactId = sh(script: "basename `git rev-parse --show-toplevel`", returnStdout: true)
 
                         currentBuild.displayName = version
 
