@@ -6,6 +6,7 @@ def call() {
     def version
     def githubRepoName
     def GIT_COMMIT_HASH_FULL
+    def artifactId
 
     pipeline {
         agent any
@@ -25,7 +26,7 @@ def call() {
                         mRevision = maven.revision()
                         version = mRevision + changelist
                         githubRepoName = sh(script: "basename `git rev-parse --show-toplevel`", returnStdout: true)
-
+                        artifactId = maven.artifactId()
                         currentBuild.displayName = version
 
                         echo "Building $version"
