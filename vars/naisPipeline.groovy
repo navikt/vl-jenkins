@@ -25,7 +25,7 @@ def call() {
                         changelist = "_" + date.format("YYYYMMDDHHmmss") + "_" + gitCommitHasdh
                         mRevision = maven.revision()
                         version = mRevision + changelist
-                        githubRepoName = sh(script: "basename -s .git `git config --get remote.origin.url`", returnStdout: true)
+                        githubRepoName = sh(script: "basename -s .git `git config --get remote.origin.url`", returnStdout: true).trim()
                         artifactId = maven.artifactId()
                         currentBuild.displayName = version
 
