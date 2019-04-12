@@ -4,8 +4,8 @@ def call() {
     def maven = new maven()
     def fpgithub = new fpgithub()
     def version
-    def githubRepoName
     def GIT_COMMIT_HASH_FULL
+    def githubRepoName
 
     pipeline {
         agent any
@@ -16,7 +16,7 @@ def call() {
 
         environment {
             LANG = "nb_NO.UTF-8"
-            JAVA_HOME = "${tool 'java-11'}"
+            JAVA_HOME = "${tool '11'}"
             PATH = "${tool 'maven-3.5.3'}/bin:${env.PATH}"
             ORACLE_HOME = "/u01/app/oracle/product/11.2.0/xe"
         }
