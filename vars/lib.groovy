@@ -18,7 +18,6 @@ def call() {
             JAVA_HOME = "${tool 'java-11'}"
             PATH = "${tool 'maven-3.5.3'}/bin:${env.PATH}"
             ORACLE_HOME = "/u01/app/oracle/product/11.2.0/xe"
-            ARTIFACTID = readMavenPom().getArtifactId()
         }
 
         stages {
@@ -35,10 +34,18 @@ def call() {
                         mRevision = maven.revision()
                         version = mRevision + changelist
 
+                        githubRepoName = sh(script: "basename -s .git `git config --get remote.origin.url`", returnStdout: true).trim()
                         currentBuild.displayName = version
 
                         echo "Building $version"
+                        fpgithub.updateBuildStatus(githubRepoName, "pending", GIT_COMMIT_HASH_FULL)
                     }
+                }
+            }
+
+            stage('Maven version') {
+                steps {
+                    sh "mvn --version"
                 }
             }
 
@@ -107,12 +114,12 @@ def call() {
         post {
             success {
                 script {
-                    fpgithub.updateBuildStatus(ARTIFACTID, "success", GIT_COMMIT_HASH_FULL)
+                    fpgithub.updateBuildStatus(githubRepoName, "success", GIT_COMMIT_HASH_FULL)
                 }
             }
             failure {
                 script {
-                    fpgithub.updateBuildStatus(ARTIFACTID, "failure", GIT_COMMIT_HASH_FULL)
+                    fpgithub.updateBuildStatus(githubRepoName, "failure", GIT_COMMIT_HASH_FULL)
                 }
             }
         }
