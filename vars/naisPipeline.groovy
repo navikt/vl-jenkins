@@ -22,7 +22,7 @@ def call() {
                         checkout scm
                         gitCommitHasdh = sh(script: "git log -n 1 --pretty=format:'%h'", returnStdout: true)
                         GIT_COMMIT_HASH_FULL = sh(script: "git log -n 1 --pretty=format:'%H'", returnStdout: true)
-                        changelist = "_" + date.format("YYYYMMDDHHmmss") + "_" + gitCommitHasdh
+                        changelist = "_" + date.format("YYYYMMddHHmmss") + "_" + gitCommitHasdh
                         mRevision = maven.revision()
                         version = mRevision + changelist
                         githubRepoName = sh(script: "basename -s .git `git config --get remote.origin.url`", returnStdout: true).trim()
