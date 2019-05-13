@@ -40,7 +40,7 @@ def call() {
             stage('Set version') {
                 steps {
                     sh "mvn --version"
-                    sh "$version > VERSION"
+                    sh "echo $version > VERSION"
                 }
             }
 
