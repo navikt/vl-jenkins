@@ -37,9 +37,10 @@ def call() {
                 }
             }
 
-            stage('Maven version') {
+            stage('Set version') {
                 steps {
                     sh "mvn --version"
+                    sh "$version > VERSION"
                 }
             }
 
