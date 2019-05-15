@@ -86,7 +86,7 @@ def call() {
             stage('Tag master') {
                 when {
                     branch 'master'
-                    return !replay
+                    expression { return !(latestTagCommitHash == GIT_COMMIT_HASH) }
                 }
                 steps {
                     sh "git tag $version -m $version"
