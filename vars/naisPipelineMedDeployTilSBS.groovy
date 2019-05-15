@@ -87,13 +87,14 @@ def call() {
             }
             stage('Deploy master til prod?') {
                 when {
+                    beforeInput true
                     branch 'master'
                 }
                 options {
                     timeout(time: 3, unit: 'DAYS')
                 }
                 input {
-                    message "Vil du deploye til prod?"
+                    message "Vil du deploye master til prod?"
                     ok "Ja, jeg vil deploye :)"
                 }
                 steps {
