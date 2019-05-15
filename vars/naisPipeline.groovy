@@ -60,6 +60,11 @@ def call() {
             }
 
             stage('Build') {
+                /*
+                when {
+                    expression { return !replay }
+                }
+                */
                 steps {
                     script {
                         withMaven (mavenSettingsConfig: 'navMavenSettings') {
@@ -86,64 +91,55 @@ def call() {
             stage('Tag master') {
                 when {
                     branch 'master'
-                    expression { return !(latestTagCommitHash == GIT_COMMIT_HASH) }
+                    //expression { return !replay }
                 }
                 steps {
                     sh "git tag $version -m $version"
                     sh "git push origin --tag"
                 }
             }
-
+/*
             stage('Deploy') {
                 when {
                     branch 'master'
                 }
                 steps {
-                    /*
                     script {
-                        def value = "s/RELEASE_VERSION/${version}/g"
-                        sh "sed \'$value\' .deploy/t4.yaml > nais.yaml"
-                        sh "k config use-context preprod-fss"
-                        sh "k apply -f nais.yaml"
-                    }
-                    */
-                    steps {
-                        script {
-                            dir ('k8s') {
-                                def props = readProperties  interpolate: true, file: "application.${MILJO}.variabler.properties"
-                                def value = "s/RELEASE_VERSION/${version}/g"
-                                props.each{ k,v -> value=value+";s%$k%$v%g" }
-                                sh "k config use-context $props.CONTEXT_NAME"
-                                sh "sed \'$value\' app.yaml > nais.yaml"
-                                sh "k apply -f nais.yaml"
-                                //sh "sed \'$value\' app.yaml | k apply -f -"
+                        dir ('k8s') {
+                            def props = readProperties  interpolate: true, file: "application.${MILJO}.variabler.properties"
+                            def value = "s/RELEASE_VERSION/${version}/g"
+                            props.each{ k,v -> value=value+";s%$k%$v%g" }
+                            sh "k config use-context $props.CONTEXT_NAME"
+                            sh "sed \'$value\' app.yaml > nais.yaml"
+                            sh "k apply -f nais.yaml"
+                            //sh "sed \'$value\' app.yaml | k apply -f -"
 
-                                def naisNamespace
-                                if (MILJO == "p") {
-                                    naisNamespace = "default"
-                                } else {
-                                    naisNamespace = MILJO
-                                }
-                                def exitCode=sh returnStatus: true, script: "k rollout status -n${naisNamespace} deployment/${ARTIFACTID}"
-                                echo "exit code is $exitCode"
-
-                                if(exitCode == 0) {
-                                    def veraPayload = "{\"environment\": \"${MILJO}\",\"application\": \"${ARTIFACTID}\",\"version\": \"${version}\",\"deployedBy\": \"Jenkins\"}"
-                                    def response = httpRequest([
-                                            url                   : "https://vera.adeo.no/api/v1/deploylog",
-                                            consoleLogResponseBody: true,
-                                            contentType           : "APPLICATION_JSON",
-                                            httpMode              : "POST",
-                                            requestBody           : veraPayload,
-                                            ignoreSslErrors       : true
-                                    ])
-                                }
-                                addBadge icon: '', id: '', link: '', text: "${MILJO}-${version}"
+                            def naisNamespace
+                            if (MILJO == "p") {
+                                naisNamespace = "default"
+                            } else {
+                                naisNamespace = MILJO
                             }
+                            def exitCode=sh returnStatus: true, script: "k rollout status -n${naisNamespace} deployment/${artifactId}"
+                            echo "exit code is $exitCode"
+
+                            if(exitCode == 0) {
+                                def veraPayload = "{\"environment\": \"${MILJO}\",\"application\": \"${artifactId}\",\"version\": \"${version}\",\"deployedBy\": \"Jenkins\"}"
+                                def response = httpRequest([
+                                        url                   : "https://vera.adeo.no/api/v1/deploylog",
+                                        consoleLogResponseBody: true,
+                                        contentType           : "APPLICATION_JSON",
+                                        httpMode              : "POST",
+                                        requestBody           : veraPayload,
+                                        ignoreSslErrors       : true
+                                ])
+                            }
+
                         }
                     }
                 }
             }
+            */
         }
 
         post {
