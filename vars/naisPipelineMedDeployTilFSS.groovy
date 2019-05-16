@@ -81,7 +81,7 @@ def call() {
                     branch 'master'
                 }
                 steps {
-                    sh "familie-kubectl config use-context preprod-fss"
+                    sh "familie-kubectl config use-context dev-fss"
                     sh "sed \'s/RELEASE_VERSION/${version}/g\' app-preprod.yaml | k apply -f -"
                 }
             }
@@ -116,7 +116,7 @@ def call() {
                     ok "Ja, jeg vil deploye :)"
                 }
                 steps {
-                    sh "familie-kubectl config use-context preprod-fss"
+                    sh "familie-kubectl config use-context dev-fss"
                     sh "sed \'s/RELEASE_VERSION/${version}/g\' app-preprod.yaml | k apply -f -"
                 }
             }
