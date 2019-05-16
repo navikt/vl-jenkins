@@ -82,7 +82,7 @@ def call() {
                 }
                 steps {
                     sh "familie-kubectl config use-context dev-fss"
-                    sh "sed \'s/RELEASE_VERSION/${version}/g\' app-preprod.yaml | k apply -f -"
+                    sh "sed \'s/RELEASE_VERSION/${version}/g\' app-preprod.yaml | familie-kubectl apply -f -"
                 }
             }
             stage('Deploy master til prod?') {
@@ -99,7 +99,7 @@ def call() {
                 }
                 steps {
                     sh "familie-kubectl config use-context prod-fss"
-                    sh "sed \'s/RELEASE_VERSION/${version}/g\' app-prod.yaml | k apply -f -"
+                    sh "sed \'s/RELEASE_VERSION/${version}/g\' app-prod.yaml | familie-kubectl apply -f -"
                 }
             }
             stage('Deploy branch til preprod?') {
@@ -117,7 +117,7 @@ def call() {
                 }
                 steps {
                     sh "familie-kubectl config use-context dev-fss"
-                    sh "sed \'s/RELEASE_VERSION/${version}/g\' app-preprod.yaml | k apply -f -"
+                    sh "sed \'s/RELEASE_VERSION/${version}/g\' app-preprod.yaml | familie-kubectl apply -f -"
                 }
             }
         }
