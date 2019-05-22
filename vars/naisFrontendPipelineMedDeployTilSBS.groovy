@@ -4,6 +4,7 @@ def call() {
     def dockerRegistryIapp=''
     def githubRepoName=''
     def tagName=''
+    def exitCode
     pipeline {
         agent any
         stages {
@@ -41,13 +42,15 @@ def call() {
                     branch 'master'
                 }
                 steps {
-                    sh "familie-kubectl config use-context dev-sbs"
-                    sh "sed \'s/RELEASE_VERSION/${tagName}/g\' app-preprod.yaml | familie-kubectl apply -f -"
+                    script {
+                        sh "familie-kubectl config use-context dev-sbs"
+                        sh "sed \'s/RELEASE_VERSION/$tagName/g\' app-preprod.yaml | familie-kubectl apply -f -"
 
-                    exitCode=sh returnStatus: true, script: "familie-kubectl rollout status deployment/$githubRepoName"
+                        exitCode = sh returnStatus: true, script: "familie-kubectl rollout status deployment/$githubRepoName"
 
-                    if (exitCode != 0) {
-                        throw error
+                        if (exitCode != 0) {
+                            throw new RuntimeException("Deploy av $githubRepoName, versjon $tagName til preprod-sbs feilet")
+                        }
                     }
                 }
             }
@@ -64,13 +67,15 @@ def call() {
                     ok "Ja, jeg vil deploye :)"
                 }
                 steps {
-                    sh "familie-kubectl config use-context prod-sbs"
-                    sh "sed \'s/RELEASE_VERSION/${tagName}/g\' app-prod.yaml | familie-kubectl apply -f -"
+                    script {
+                        sh "familie-kubectl config use-context prod-sbs"
+                        sh "sed \'s/RELEASE_VERSION/$tagName/g\' app-prod.yaml | familie-kubectl apply -f -"
 
-                    exitCode=sh returnStatus: true, script: "familie-kubectl rollout status deployment/$githubRepoName"
+                        exitCode = sh returnStatus: true, script: "familie-kubectl rollout status deployment/$githubRepoName"
 
-                    if (exitCode != 0) {
-                        throw error
+                        if (exitCode != 0) {
+                            throw new RuntimeException("Deploy av $githubRepoName, versjon $tagName til prod-sbs feilet")
+                        }
                     }
                 }
             }
@@ -88,13 +93,15 @@ def call() {
                     ok "Ja, jeg vil deploye :)"
                 }
                 steps {
-                    sh "familie-kubectl config use-context dev-sbs"
-                    sh "sed \'s/RELEASE_VERSION/${tagName}/g\' app-preprod.yaml | familie-kubectl apply -f -"
+                    script {
+                        sh "familie-kubectl config use-context dev-sbs"
+                        sh "sed \'s/RELEASE_VERSION/$tagName/g\' app-preprod.yaml | familie-kubectl apply -f -"
 
-                    exitCode=sh returnStatus: true, script: "familie-kubectl rollout status deployment/$githubRepoName"
+                        exitCode = sh returnStatus: true, script: "familie-kubectl rollout status deployment/$githubRepoName"
 
-                    if (exitCode != 0) {
-                        throw error
+                        if (exitCode != 0) {
+                            throw new RuntimeException("Deploy av $githubRepoName, versjon $tagName til preprod-sbs feilet")
+                        }
                     }
                 }
             }
