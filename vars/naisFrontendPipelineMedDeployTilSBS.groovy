@@ -43,6 +43,12 @@ def call() {
                 steps {
                     sh "familie-kubectl config use-context dev-sbs"
                     sh "sed \'s/RELEASE_VERSION/${tagName}/g\' app-preprod.yaml | familie-kubectl apply -f -"
+
+                    exitCode=sh returnStatus: true, script: "familie-kubectl rollout status deployment/$githubRepoName"
+
+                    if (exitCode != 0) {
+                        throw error
+                    }
                 }
             }
             stage('Deploy master til prod?') {
@@ -60,6 +66,12 @@ def call() {
                 steps {
                     sh "familie-kubectl config use-context prod-sbs"
                     sh "sed \'s/RELEASE_VERSION/${tagName}/g\' app-prod.yaml | familie-kubectl apply -f -"
+
+                    exitCode=sh returnStatus: true, script: "familie-kubectl rollout status deployment/$githubRepoName"
+
+                    if (exitCode != 0) {
+                        throw error
+                    }
                 }
             }
             stage('Deploy branch til preprod?') {
@@ -78,6 +90,12 @@ def call() {
                 steps {
                     sh "familie-kubectl config use-context dev-sbs"
                     sh "sed \'s/RELEASE_VERSION/${tagName}/g\' app-preprod.yaml | familie-kubectl apply -f -"
+
+                    exitCode=sh returnStatus: true, script: "familie-kubectl rollout status deployment/$githubRepoName"
+
+                    if (exitCode != 0) {
+                        throw error
+                    }
                 }
             }
         }
