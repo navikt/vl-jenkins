@@ -57,6 +57,8 @@ def call() {
                             ENV_VAL = sh (script: "env | sort -h", returnStdout: true)
                             sh "echo $ENV_VAL"
 
+                            sh "echo $PATH"
+
 
                             sh "mvn -B -Dfile.encoding=UTF-8 -DinstallAtEnd=true -DdeployAtEnd=true -Dsha1= -Dchangelist= -Drevision=$version clean install"
                             sh "docker build --pull -t $dockerRegistryIapp/$artifactId:$version ."
