@@ -89,7 +89,7 @@ def call() {
                         exitCode=sh returnStatus: true, script: "familie-kubectl rollout status deployment/$artifactId"
 
                         if (exitCode != 0) {
-                            throw error
+                            throw new RuntimeException("Deploy av $artifactId, versjon $version til dev-fss feilet")
                         }
                     }
                 }
@@ -114,7 +114,7 @@ def call() {
                         exitCode=sh returnStatus: true, script: "familie-kubectl rollout status deployment/$artifactId"
 
                         if (exitCode != 0) {
-                            throw error
+                            throw new RuntimeException("Deploy av $artifactId, versjon $version til prod-fss feilet")
                         }
                     }
                 }
@@ -138,10 +138,9 @@ def call() {
                         sh "sed \'s/RELEASE_VERSION/${version}/g\' app-preprod.yaml | familie-kubectl apply -f -"
 
                         exitCode=sh returnStatus: true, script: "familie-kubectl rollout status deployment/$artifactId"
-                        echo "exit code er $exitCode"
 
                         if (exitCode != 0) {
-                            throw error
+                            throw new RuntimeException("Deploy av $artifactId, versjon $version til dev-fss feilet")
                         }
                     }
                 }

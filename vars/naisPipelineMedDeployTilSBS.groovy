@@ -89,7 +89,7 @@ def call() {
                         exitCode=sh returnStatus: true, script: "familie-kubectl rollout status deployment/$artifactId"
 
                         if (exitCode != 0) {
-                            throw error
+                            throw new RuntimeException("Deploy av $artifactId, versjon $version til dev-sbs feilet")
                         }
                     }
                 }
@@ -114,7 +114,7 @@ def call() {
                         exitCode=sh returnStatus: true, script: "familie-kubectl rollout status deployment/$artifactId"
 
                         if (exitCode != 0) {
-                            throw error
+                            throw new RuntimeException("Deploy av $artifactId, versjon $version til prod-sbs feilet")
                         }
                     }
                 }
@@ -140,7 +140,7 @@ def call() {
                         exitCode=sh returnStatus: true, script: "familie-kubectl rollout status deployment/$artifactId"
 
                         if (exitCode != 0) {
-                            throw error
+                            throw new RuntimeException("Deploy av $artifactId, versjon $version til dev-sbs feilet")
                         }
                     }
                 }
