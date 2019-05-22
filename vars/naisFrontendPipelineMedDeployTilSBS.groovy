@@ -32,7 +32,7 @@ def call() {
                     branch 'master'
                 }
                 steps {
-                    sh "git tag $version -m $version"
+                    sh "git tag $tagName -m $tagName"
                     sh "git push origin --tag"
                 }
             }
@@ -42,7 +42,7 @@ def call() {
                 }
                 steps {
                     sh "familie-kubectl config use-context dev-sbs"
-                    sh "sed \'s/RELEASE_VERSION/${version}/g\' app-preprod.yaml | familie-kubectl apply -f -"
+                    sh "sed \'s/RELEASE_VERSION/${tagName}/g\' app-preprod.yaml | familie-kubectl apply -f -"
                 }
             }
             stage('Deploy master til prod?') {
@@ -59,7 +59,7 @@ def call() {
                 }
                 steps {
                     sh "familie-kubectl config use-context prod-sbs"
-                    sh "sed \'s/RELEASE_VERSION/${version}/g\' app-prod.yaml | familie-kubectl apply -f -"
+                    sh "sed \'s/RELEASE_VERSION/${tagName}/g\' app-prod.yaml | familie-kubectl apply -f -"
                 }
             }
             stage('Deploy branch til preprod?') {
