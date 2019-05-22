@@ -87,7 +87,6 @@ def call() {
                         sh "sed \'s/RELEASE_VERSION/${version}/g\' app-preprod.yaml | familie-kubectl apply -f -"
 
                         exitCode=sh returnStatus: true, script: "familie-kubectl rollout status deployment/$artifactId"
-                        echo "exit code er $exitCode"
 
                         if (exitCode != 0) {
                             throw error
@@ -108,8 +107,16 @@ def call() {
                     ok "Ja, jeg vil deploye :)"
                 }
                 steps {
-                    sh "familie-kubectl config use-context prod-sbs"
-                    sh "sed \'s/RELEASE_VERSION/${version}/g\' app-prod.yaml | familie-kubectl apply -f -"
+                    script {
+                        sh "familie-kubectl config use-context prod-sbs"
+                        sh "sed \'s/RELEASE_VERSION/${version}/g\' app-prod.yaml | familie-kubectl apply -f -"
+
+                        exitCode=sh returnStatus: true, script: "familie-kubectl rollout status deployment/$artifactId"
+
+                        if (exitCode != 0) {
+                            throw error
+                        }
+                    }
                 }
             }
             stage('Deploy branch til preprod?') {
@@ -131,7 +138,6 @@ def call() {
                         sh "sed \'s/RELEASE_VERSION/${version}/g\' app-preprod.yaml | familie-kubectl apply -f -"
 
                         exitCode=sh returnStatus: true, script: "familie-kubectl rollout status deployment/$artifactId"
-                        echo "exit code er $exitCode"
 
                         if (exitCode != 0) {
                             throw error

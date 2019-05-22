@@ -7,6 +7,7 @@ def call() {
     def githubRepoName
     def GIT_COMMIT_HASH_FULL
     def artifactId
+    def exitCode
 
     pipeline {
         agent any
@@ -81,8 +82,16 @@ def call() {
                     branch 'master'
                 }
                 steps {
-                    sh "familie-kubectl config use-context dev-fss"
-                    sh "sed \'s/RELEASE_VERSION/${version}/g\' app-preprod.yaml | familie-kubectl apply -f -"
+                    script {
+                        sh "familie-kubectl config use-context dev-fss"
+                        sh "sed \'s/RELEASE_VERSION/${version}/g\' app-preprod.yaml | familie-kubectl apply -f -"
+
+                        exitCode=sh returnStatus: true, script: "familie-kubectl rollout status deployment/$artifactId"
+
+                        if (exitCode != 0) {
+                            throw error
+                        }
+                    }
                 }
             }
             stage('Deploy master til prod?') {
@@ -98,8 +107,16 @@ def call() {
                     ok "Ja, jeg vil deploye :)"
                 }
                 steps {
-                    sh "familie-kubectl config use-context prod-fss"
-                    sh "sed \'s/RELEASE_VERSION/${version}/g\' app-prod.yaml | familie-kubectl apply -f -"
+                    script {
+                        sh "familie-kubectl config use-context prod-fss"
+                        sh "sed \'s/RELEASE_VERSION/${version}/g\' app-prod.yaml | familie-kubectl apply -f -"
+
+                        exitCode=sh returnStatus: true, script: "familie-kubectl rollout status deployment/$artifactId"
+
+                        if (exitCode != 0) {
+                            throw error
+                        }
+                    }
                 }
             }
             stage('Deploy branch til preprod?') {
@@ -116,8 +133,17 @@ def call() {
                     ok "Ja, jeg vil deploye :)"
                 }
                 steps {
-                    sh "familie-kubectl config use-context dev-fss"
-                    sh "sed \'s/RELEASE_VERSION/${version}/g\' app-preprod.yaml | familie-kubectl apply -f -"
+                    script {
+                        sh "familie-kubectl config use-context dev-fss"
+                        sh "sed \'s/RELEASE_VERSION/${version}/g\' app-preprod.yaml | familie-kubectl apply -f -"
+
+                        exitCode=sh returnStatus: true, script: "familie-kubectl rollout status deployment/$artifactId"
+                        echo "exit code er $exitCode"
+
+                        if (exitCode != 0) {
+                            throw error
+                        }
+                    }
                 }
             }
         }
