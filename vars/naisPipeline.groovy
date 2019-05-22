@@ -54,6 +54,10 @@ def call() {
                                 buildEnvironment.overrideJDK(maven.javaVersion())
                             }
 
+                            ENV_VAL = sh (script: "env | sort -h", returnStdout: true)
+                            echo $ENV_VAL
+
+
                             sh "mvn -B -Dfile.encoding=UTF-8 -DinstallAtEnd=true -DdeployAtEnd=true -Dsha1= -Dchangelist= -Drevision=$version clean install"
                             sh "docker build --pull -t $dockerRegistryIapp/$artifactId:$version ."
                             withCredentials([[$class          : 'UsernamePasswordMultiBinding',
