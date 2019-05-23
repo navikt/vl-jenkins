@@ -142,6 +142,7 @@ def call() {
                         exitCode=sh returnStatus: true, script: "familie-kubectl rollout status deployment/$artifactId"
 
                         if (exitCode != 0) {
+                            slackSend(color: "#FF0000", channel: "team-familie-dev", message: "Dette er en test :)")
                             throw new RuntimeException("Deploy av $artifactId, versjon $version til preprod-fss feilet")
                         }
                     }
