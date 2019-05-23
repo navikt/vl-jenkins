@@ -3,6 +3,7 @@ import no.nav.jenkins.*
 def call() {
     def maven = new maven()
     def fpgithub = new fpgithub()
+    def slack = new slack()
     def version
     def githubRepoName
     def GIT_COMMIT_HASH_FULL
