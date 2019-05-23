@@ -10,7 +10,7 @@ def call() {
     def exitCode
 
     pipeline {
-        agent master
+        agent { label 'master' }
         stages {
             stage('Checkout scm') {
                 steps {
