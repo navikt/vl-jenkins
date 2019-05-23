@@ -19,7 +19,7 @@ def makeTestStatus(testResultAction, allureUrl) {
 
 def call(body) {
     def config = [:]
-    body.resolveStrategy = Closure.DELEGATE_FIRST
+    //body.resolveStrategy = Closure.DELEGATE_FIRST TODO: Feiler på jenkins
     body.delegate = config
     body()
 
