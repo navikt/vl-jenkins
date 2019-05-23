@@ -49,6 +49,7 @@ def call() {
                         exitCode = sh returnStatus: true, script: "familie-kubectl rollout status deployment/$githubRepoName"
 
                         if (exitCode != 0) {
+                            slackSend(color: "#FF0000", channel: "team-familie-dev", message: "Deploy av $artifactId, versjon $version til preprod-sbs feilet")
                             throw new RuntimeException("Deploy av $githubRepoName, versjon $tagName til preprod-sbs feilet")
                         }
                     }
@@ -74,6 +75,7 @@ def call() {
                         exitCode = sh returnStatus: true, script: "familie-kubectl rollout status deployment/$githubRepoName"
 
                         if (exitCode != 0) {
+                            slackSend(color: "#FF0000", channel: "team-familie-dev", message: "Deploy av $artifactId, versjon $version til prod-sbs feilet")
                             throw new RuntimeException("Deploy av $githubRepoName, versjon $tagName til prod-sbs feilet")
                         }
                     }

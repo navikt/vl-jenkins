@@ -89,7 +89,8 @@ def call() {
                         exitCode=sh returnStatus: true, script: "familie-kubectl rollout status deployment/$artifactId"
 
                         if (exitCode != 0) {
-                            throw new RuntimeException("Deploy av $artifactId, versjon $version til dev-fss feilet")
+                            slackSend(color: "#FF0000", channel: "team-familie-dev", message: "Deploy av $artifactId, versjon $version til preprod-fss feilet")
+                            throw new RuntimeException("Deploy av $artifactId, versjon $version til preprod-fss feilet")
                         }
                     }
                 }
@@ -114,6 +115,7 @@ def call() {
                         exitCode=sh returnStatus: true, script: "familie-kubectl rollout status deployment/$artifactId"
 
                         if (exitCode != 0) {
+                            slackSend(color: "#FF0000", channel: "team-familie-dev", message: "Deploy av $artifactId, versjon $version til prod-fss feilet")
                             throw new RuntimeException("Deploy av $artifactId, versjon $version til prod-fss feilet")
                         }
                     }
@@ -140,7 +142,7 @@ def call() {
                         exitCode=sh returnStatus: true, script: "familie-kubectl rollout status deployment/$artifactId"
 
                         if (exitCode != 0) {
-                            throw new RuntimeException("Deploy av $artifactId, versjon $version til dev-fss feilet")
+                            throw new RuntimeException("Deploy av $artifactId, versjon $version til preprod-fss feilet")
                         }
                     }
                 }
