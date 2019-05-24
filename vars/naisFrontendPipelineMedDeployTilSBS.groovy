@@ -6,7 +6,7 @@ def call() {
     def tagName=''
     def exitCode
     pipeline {
-        agent any
+        agent { label 'master' }
         stages {
             stage('Checkout Tags') { // checkout only tags.
                 steps {
