@@ -55,7 +55,7 @@ def call() {
                             }
 
                             ENV_VAL = sh (script: "env | sort -h", returnStdout: true)
-                            sh "echo $ENV_VAL"
+                            //sh "echo $ENV_VAL"
 
                             //sh "echo $PATH"
 
