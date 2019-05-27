@@ -54,7 +54,7 @@ def call() {
                                 buildEnvironment.overrideJDK(maven.javaVersion())
                             }
 
-                            ENV_VAL = sh (script: "env | sort -h", returnStdout: true)
+                            //ENV_VAL = sh (script: "env | sort -h", returnStdout: true)
                             //sh "echo $ENV_VAL"
 
                             //sh "echo $PATH"
