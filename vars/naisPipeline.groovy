@@ -49,7 +49,7 @@ def call() {
                     script {
                         withMaven (mavenSettingsConfig: 'navMavenSettings') {
                             buildEnvironment = new buildEnvironment()
-
+                            buildEnvironment.setEnv()
                             if (maven.javaVersion() != null) {
                                 buildEnvironment.overrideJDK(maven.javaVersion())
                             }
