@@ -58,7 +58,9 @@ def call() {
                             //sh "echo $ENV_VAL"
 
                             //sh "echo $PATH"
-
+                            envs = sh(returnStdout: true, script: 'env | sort -h').trim()
+                            echo("envs: " + envs)
+                            sh "yarn version"
 
                             sh "mvn -B -Dfile.encoding=UTF-8 -DinstallAtEnd=true -DdeployAtEnd=true -Dsha1= -Dchangelist= -Drevision=$version clean install"
                             sh "docker build --pull -t $dockerRegistryIapp/$artifactId:$version ."
