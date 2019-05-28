@@ -2,7 +2,7 @@ package no.nav.jenkins
 
 def setEnv() {
     env.LANG = "nb_NO.UTF-8"
-    env.JAVA_HOME = "${tool 'jdk-1.8'}"
+    env.JAVA_HOME = "${tool '11'}"
     env.PATH = "${tool 'default-maven'}/bin:${env.PATH}:/opt/yarn-v1.12.3/bin:/usr/local/lib/node/nodejs/bin"
     env.ORACLE_HOME = "/u01/app/oracle/product/11.2.0/xe"
     env.MAVEN_OPTS = "-Xms512m -Xmx1024m -XX:+TieredCompilation -XX:TieredStopAtLevel=1 "
