@@ -48,7 +48,7 @@ def call(body) {
         //def mail = new mail()
         //def slack = new slack()
         //def jira = new jira()
-        def dockerLokal = new dockerLokal()
+        def dockerLokal = new dockerLocal()
         //def buildEnvironment = new buildEnvironment()
 
         //def db = new db()
