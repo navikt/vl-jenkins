@@ -8,8 +8,8 @@ def call() {
     def githubRepoName
 
     pipeline {
-        agent any
-
+        //agent any
+        agent { label 'MASTER' }
         options {
             timestamps()
         }
