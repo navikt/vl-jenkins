@@ -9,8 +9,8 @@ def call() {
     def artifactId
 
     pipeline {
-        agent any
-
+        //agent any
+       agent { label 'MASTER' }
         stages {
 
             stage('Checkout scm') {
