@@ -51,9 +51,9 @@ def call(body) {
         def dockerLokal = new dockerLokal()
         //def buildEnvironment = new buildEnvironment()
 
-        def db = new db()
+        //def db = new db()
         def maven = new maven()
-        def environment = new environment()
+        //def environment = new environment()
 
         def mvnTestProperties = ["junit.jupiter.execution.parallel.enabled"                 : "true",
                                  "junit.jupiter.execution.parallel.config.strategy"         : "fixed",
@@ -92,17 +92,17 @@ def call(body) {
 
                 stage("Init") {
                     console.printStage("Init")
-                    environment.setEnv()
+                    //environment.setEnv()
                     env.MAVEN_OPTS = "-Xms1024m -Xmx2048m -XX:+TieredCompilation -XX:TieredStopAtLevel=1"
                     //Extra juice. Overskriver verdier fra setEnv.
 
                     step([$class: 'WsCleanup'])
                     checkout scm
-
+/*
                     if (maven.javaVersion() != null) {
                         environment.overrideJDK(maven.javaVersion())
                     }
-
+*/
                     def workspace = pwd()
                     def dsfile = workspace + "/resources/pipeline/" + applikasjon + "_datasource.list"
 
