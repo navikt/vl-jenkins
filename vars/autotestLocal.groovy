@@ -44,12 +44,12 @@ def call(body) {
         ])
 
         def console = new console()
-        def branch = new branch()
-        def mail = new mail()
-        def slack = new slack()
-        def jira = new jira()
-        def dockerLokal = new docker()
-        def buildEnvironment = new buildEnvironment()
+        //def branch = new branch()
+        //def mail = new mail()
+        //def slack = new slack()
+        //def jira = new jira()
+        def dockerLokal = new dockerLokal()
+        //def buildEnvironment = new buildEnvironment()
 
         def db = new db()
         def maven = new maven()
