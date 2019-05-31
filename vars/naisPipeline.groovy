@@ -7,10 +7,11 @@ def call() {
     def githubRepoName
     def GIT_COMMIT_HASH_FULL
     def artifactId
+    def nodeLabel = (env.BRANCH_NAME == 'master') ? 'MASTER' : 'DOCKER'
 
     pipeline {
         //agent any
-       agent { label 'MASTER' }
+       agent { label nodeLabel }
         stages {
 
             stage('Checkout scm') {
