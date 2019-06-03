@@ -82,7 +82,6 @@ def call() {
                     branch 'master'
                 }
                 steps {
-                    agent none
                     script {
                         sh "familie-kubectl config use-context dev-sbs"
                         sh "sed \'s/RELEASE_VERSION/${version}/g\' app-preprod.yaml | familie-kubectl apply -f -"
@@ -96,7 +95,6 @@ def call() {
                 }
             }
             stage('Deploy master til prod?') {
-                agent none
                 when {
                     beforeInput true
                     branch 'master'
@@ -122,7 +120,6 @@ def call() {
                 }
             }
             stage('Deploy branch til preprod?') {
-                agent none
                 when {
                     not {
                         branch 'master'
