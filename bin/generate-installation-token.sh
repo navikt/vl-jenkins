@@ -12,7 +12,7 @@ fi
 ACCOUNT_NAME="navikt"
 APP_TOKEN="$1"
 
-INSTALLATION_ID_RESPONSE=$(curl -v --proxy http://webproxy-internett.nav.no:8088 -H "Authorization: Bearer ${APP_TOKEN}" \
+INSTALLATION_ID_RESPONSE=$(curl -s --proxy http://webproxy-internett.nav.no:8088 -H "Authorization: Bearer ${APP_TOKEN}" \
     -H "Accept: application/vnd.github.machine-man-preview+json" \
     https://api.github.com/app/installations)
 
