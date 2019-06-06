@@ -106,16 +106,15 @@ def call() {
                     branch 'master'
                 }
                 steps {
-                    input message: 'Vil du deploye master til prod?', ok: 'Ja, jeg vil deploye :)'
+                    timeout(time: 3, unit: 'DAYS') {
+                        input message: 'Vil du deploye master til prod?', ok: 'Ja, jeg vil deploye :)'
+                    }
                 }
             }
             stage('Deploy master til prod?') {
                 agent { label 'master' }
                 when {
                     branch 'master'
-                }
-                options {
-                    timeout(time: 3, unit: 'DAYS')
                 }
                 steps {
                     script {
@@ -139,7 +138,9 @@ def call() {
                     }
                 }
                 steps {
-                    input message: 'Vil du deploye branch til preprod?', ok: 'Ja, jeg vil deploye :)'
+                    timeout(time: 30, unit: 'MINUTES') {
+                        input message: 'Vil du deploye branch til preprod?', ok: 'Ja, jeg vil deploye :)'
+                    }
                 }
             }
             stage('Deploy branch til preprod?') {
@@ -148,9 +149,6 @@ def call() {
                     not {
                         branch 'master'
                     }
-                }
-                options {
-                    timeout(time: 30, unit: 'MINUTES')
                 }
                 steps {
                     script {
