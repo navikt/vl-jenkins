@@ -10,9 +10,10 @@ def call() {
     def exitCode
 
     pipeline {
-        agent { label 'master' }
+        agent none
         stages {
             stage('Checkout scm') {
+                agent { label 'master' }
                 steps {
                     script {
                         Date date = new Date()
@@ -37,6 +38,7 @@ def call() {
             }
 
             stage('Set version') {
+                agent { label 'master' }
                 steps {
                     sh "mvn --version"
                     sh "echo $version > VERSION"
@@ -44,6 +46,7 @@ def call() {
             }
 
             stage('Build') {
+                agent { label 'master' }
                 steps {
                     script {
                         withMaven (mavenSettingsConfig: 'navMavenSettings') {
@@ -69,6 +72,7 @@ def call() {
             }
 
             stage('Tag master') {
+                agent { label 'master' }
                 when {
                     branch 'master'
                 }
@@ -78,6 +82,7 @@ def call() {
                 }
             }
             stage('Deploy master til preprod') {
+                agent { label 'master' }
                 when {
                     branch 'master'
                 }
@@ -94,17 +99,22 @@ def call() {
                     }
                 }
             }
-            stage('Deploy master til prod?') {
+            stage('Godkjenn deploy av master til prod') {
+                agent none
                 when {
                     beforeInput true
                     branch 'master'
                 }
-                options {
-                    timeout(time: 3, unit: 'DAYS')
+                steps {
+                    timeout(time: 3, unit: 'DAYS') {
+                        input message: 'Vil du deploye master til prod?', ok: 'Ja, jeg vil deploye :)'
+                    }
                 }
-                input {
-                    message "Vil du deploye master til prod?"
-                    ok "Ja, jeg vil deploye :)"
+            }
+            stage('Deploy master til prod') {
+                agent { label 'master' }
+                when {
+                    branch 'master'
                 }
                 steps {
                     script {
@@ -119,18 +129,26 @@ def call() {
                     }
                 }
             }
-            stage('Deploy branch til preprod?') {
+            stage('Godkjenn deploy av branch til preprod') {
+                agent none
                 when {
+                    beforeInput true
                     not {
                         branch 'master'
                     }
                 }
-                options {
-                    timeout(time: 30, unit: 'MINUTES')
+                steps {
+                    timeout(time: 30, unit: 'MINUTES') {
+                        input message: 'Vil du deploye branch til preprod?', ok: 'Ja, jeg vil deploye :)'
+                    }
                 }
-                input {
-                    message "Vil du deploye til preprod?"
-                    ok "Ja, jeg vil deploye :)"
+            }
+            stage('Deploy branch til preprod') {
+                agent { label 'master' }
+                when {
+                    not {
+                        branch 'master'
+                    }
                 }
                 steps {
                     script {

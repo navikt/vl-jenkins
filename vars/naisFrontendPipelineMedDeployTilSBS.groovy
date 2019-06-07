@@ -6,9 +6,10 @@ def call() {
     def tagName=''
     def exitCode
     pipeline {
-        agent { label 'master' }
+        agent none
         stages {
             stage('Checkout Tags') { // checkout only tags.
+                agent { label 'master' }
                 steps {
                     script {
                         dockerRegistryIapp = "repo.adeo.no:5443"
@@ -20,6 +21,7 @@ def call() {
                 }
             }
             stage('Build and Push'){
+                agent { label 'master' }
                 steps {
                     sh 'PATH=$PATH:/usr/local/lib/node/nodejs/bin:/opt/yarn-v1.12.3/bin; yarn install --ignore-scripts'
                     sh 'PATH=$PATH:/usr/local/lib/node/nodejs/bin:/opt/yarn-v1.12.3/bin; yarn build'
@@ -29,6 +31,7 @@ def call() {
                 }
             }
             stage('Tag master') {
+                agent { label 'master' }
                 when {
                     branch 'master'
                 }
@@ -38,6 +41,7 @@ def call() {
                 }
             }
             stage('Deploy master til preprod') {
+                agent { label 'master' }
                 when {
                     branch 'master'
                 }
@@ -54,17 +58,22 @@ def call() {
                     }
                 }
             }
-            stage('Deploy master til prod?') {
+            stage('Godkjenn deploy av master til prod') {
+                agent none
                 when {
                     beforeInput true
                     branch 'master'
                 }
-                options {
-                    timeout(time: 3, unit: 'DAYS')
+                steps {
+                    timeout(time: 3, unit: 'DAYS') {
+                        input message: 'Vil du deploye master til prod?', ok: 'Ja, jeg vil deploye :)'
+                    }
                 }
-                input {
-                    message "Vil du deploye master til prod?"
-                    ok "Ja, jeg vil deploye :)"
+            }
+            stage('Deploy master til prod') {
+                agent { label 'master' }
+                when {
+                    branch 'master'
                 }
                 steps {
                     script {
@@ -79,18 +88,26 @@ def call() {
                     }
                 }
             }
-            stage('Deploy branch til preprod?') {
+            stage('Godkjenn deploy av branch til preprod') {
+                agent none
                 when {
+                    beforeInput true
                     not {
                         branch 'master'
                     }
                 }
-                options {
-                    timeout(time: 30, unit: 'MINUTES')
+                steps {
+                    timeout(time: 30, unit: 'MINUTES') {
+                        input message: 'Vil du deploye branch til preprod?', ok: 'Ja, jeg vil deploye :)'
+                    }
                 }
-                input {
-                    message "Vil du deploye til preprod?"
-                    ok "Ja, jeg vil deploye :)"
+            }
+            stage('Deploy branch til preprod') {
+                agent { label 'master' }
+                when {
+                    not {
+                        branch 'master'
+                    }
                 }
                 steps {
                     script {
