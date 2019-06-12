@@ -60,6 +60,9 @@ def call() {
 
 
                             sh "mvn -B -Dfile.encoding=UTF-8 -DinstallAtEnd=true -DdeployAtEnd=true -Dsha1= -Dchangelist= -Drevision=$version clean install"
+                            if(artifactId.equalsIgnoreCase("fpmock2")){
+                                sh "mvn -B -Dfile.encoding=UTF-8 -Dsha1= -Dchangelist= -Drevision=$version deploy"
+                            }
                             sh "docker build --pull -t $dockerRegistryIapp/$artifactId:$version ."
                             withCredentials([[$class          : 'UsernamePasswordMultiBinding',
                                               credentialsId   : 'nexusUser',
