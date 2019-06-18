@@ -4,6 +4,9 @@ def call() {
     def maven = new maven()
     def appName = ''
     def exitCode
+    def naisAppImage = ''
+    def deployedVersionTag = ''
+
     pipeline {
         agent none
         stages {
@@ -20,13 +23,28 @@ def call() {
                     }
                 }
             }
-            stage('Godkjenn deploy av versjon') {
+            stage('Rollback oppsummering') {
                 agent { label 'master' }
                 steps {
-                    echo "* * * * * * * * * * * * *"
-                    echo "Valgt versjon: $versionToDeploy"
-                    echo "Valgt miljø: $deployToEnvironment"
-                    echo "* * * * * * * * * * * * *"
+                    script {
+                        dockerRegistryIapp = "repo.adeo.no:5443"
+                        sh "familie-kubectl config use-context dev-sbs"
+                        naisAppImage = sh(script: "familie-kubectl get deployments -l app=$appName -o jsonpath='{.items[0].spec.template.spec.containers[0].image}'", returnStdout: true)
+                        deployedVersionTag = naisAppImage - "$dockerRegistryIapp/$appName:"
+
+                        echo "* * * * * * * * * * * * * * * * * * * * * * * * * * *"
+                        echo "Valgt versjon: $versionToDeploy"
+                        echo "Valgt miljø: $deployToEnvironment"
+                        if (versionToDeploy == deployedVersionTag) {
+                            echo "ADVARSEL: Valgt versjon er lik deployet versjon!"
+                        }
+                        echo "* * * * * * * * * * * * * * * * * * * * * * * * * * *"
+                    }
+                }
+            }
+            stage('Godkjenn deploy av versjon') {
+                agent none
+                steps {
                     timeout(time: 30, unit: 'MINUTES') {
                         input message: 'Vil du deploye valgt versjon til valgt miljø?', ok: 'Ja, jeg vil deploye :)'
                     }
