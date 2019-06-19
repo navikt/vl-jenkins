@@ -87,7 +87,7 @@ def call(body) {
 
                 String nyTag = "autotest"
                 String sutToRun = applikasjonVersjon
-                String dockerRegistry = "docker.adeo.no:5000"
+                String dockerRegistry = "repo.adeo.no:5443"
 
 
                 stage("Init") {
@@ -114,6 +114,7 @@ def call(body) {
 
 
                 stage("Cleanup docker ps og images") {
+                    sh('whoami')
 
                     sh 'docker stop $(docker ps -a -q) || true'
                     sh 'docker rm $(docker ps -a -q) || true'
