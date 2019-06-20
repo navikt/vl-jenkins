@@ -44,16 +44,8 @@ def call(body) {
         ])
 
         def console = new console()
-        //def branch = new branch()
-        //def mail = new mail()
-        //def slack = new slack()
-        //def jira = new jira()
         def dockerLokal = new dockerLocal()
-        //def buildEnvironment = new buildEnvironment()
-
-        //def db = new db()
         def maven = new maven()
-        //def environment = new environment()
 
         def mvnTestProperties = ["junit.jupiter.execution.parallel.enabled"                 : "true",
                                  "junit.jupiter.execution.parallel.config.strategy"         : "fixed",
@@ -130,12 +122,12 @@ def call(body) {
 
 
                 stage("Start VTP") {
-                    sh "docker run -d --name fpmock2 -p 8636:8636 -p 8063:8063 -p 8060:8060 -p 8001:8001 docker.adeo.no:5000/fpmock2:latest"
+                    sh "docker run -d --name fpmock2 -p 8636:8636 -p 8063:8063 -p 8060:8060 -p 8001:8001 "+dockerRegistry+"/fpmock2:latest"
                 }
 
                 stage("Start SUT") {
                     def workspace = pwd()
-                    sh "docker run -d --name $applikasjon -v $workspace/resources/pipeline/keystore:/var/run/secrets/naisd.io/ --env-file $workspace/resources/pipeline/autotest.list --env-file $workspace/resources/pipeline/" + params.applikasjon + "_datasource.list -p 8080:8080 -p 8000:8000 --link fpmock2:fpmock2 docker.adeo.no:5000/$applikasjon:$sutToRun"
+                    sh "docker run -d --name $applikasjon -v $workspace/resources/pipeline/keystore:/var/run/secrets/naisd.io/ --env-file $workspace/resources/pipeline/autotest.list --env-file $workspace/resources/pipeline/" + params.applikasjon + "_datasource.list -p 8080:8080 -p 8000:8000 --link fpmock2:fpmock2 "+dockerRegistry+"/$applikasjon:$sutToRun"
                 }
 
                 stage("Verifiserer VTP") {
