@@ -89,6 +89,8 @@ def call(body) {
                     checkout scm
 
                     vtpVersjon = sh(script: "git ls-remote --tags git@vtp.github.com:navikt/vtp.git | sort -t '/' -k 3 -V | tail -2 | head -1 | grep -o '[^\\/]*\$'", returnSdtout: true)?.trim();
+
+                    println "Using VTP version '${vtpVersjon}'"
 /*
                     if (maven.javaVersion() != null) {
                         environment.overrideJDK(maven.javaVersion())
