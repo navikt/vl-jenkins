@@ -19,7 +19,6 @@ def makeTestStatus(testResultAction, allureUrl) {
 
 def call(body) {
     def config = [:]
-    //body.resolveStrategy = Closure.DELEGATE_FIRST TODO: Feiler på jenkins
     body.delegate = config
     body()
 
@@ -28,9 +27,6 @@ def call(body) {
 
     timestamps {
 
-        String deployShaTemp = ''
-        String nArtifactId = ''
-        String nyVtpTag
 
         properties([disableConcurrentBuilds(), parameters([
                 string(defaultValue: '', description: 'Applikasjon SUT, f.eks fpsak', name: 'applikasjon'),
@@ -90,6 +86,8 @@ def call(body) {
 
                     step([$class: 'WsCleanup'])
                     checkout scm
+
+                    sh "git ls-remote --tags git@vtp.github.com:navikt/vtp.git | sort -t '/' -k 3 -V | tail -2 | head -1 | grep -o '[^\\/]*\$'"
 /*
                     if (maven.javaVersion() != null) {
                         environment.overrideJDK(maven.javaVersion())
@@ -131,7 +129,7 @@ def call(body) {
                 }
 
                 stage("Verifiserer VTP") {
-                    int retryLimit = 40
+                    int retryLimit = 20
                     int vtpRetry = 0
                     int vent = 5
                     while (!dockerLokal.sjekkLokalVtpStatus()) {
