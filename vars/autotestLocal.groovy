@@ -76,6 +76,7 @@ def call(body) {
                 String nyTag = "autotest"
                 String sutToRun = applikasjonVersjon
                 String dockerRegistry = "repo.adeo.no:5443"
+                def vtpVersjon = "latest"
 
 
                 stage("Init") {
@@ -87,7 +88,7 @@ def call(body) {
                     step([$class: 'WsCleanup'])
                     checkout scm
 
-                    sh "git ls-remote --tags git@vtp.github.com:navikt/vtp.git | sort -t '/' -k 3 -V | tail -2 | head -1 | grep -o '[^\\/]*\$'"
+                    vtpVersjon = sh(script: "git ls-remote --tags git@vtp.github.com:navikt/vtp.git | sort -t '/' -k 3 -V | tail -2 | head -1 | grep -o '[^\\/]*\$'", returnSdtout: true)?.trim();
 /*
                     if (maven.javaVersion() != null) {
                         environment.overrideJDK(maven.javaVersion())
@@ -113,14 +114,14 @@ def call(body) {
 
                 stage("Pull") {
                     sh "docker pull $dockerRegistry/$applikasjon:$params.applikasjonVersjon"
-                    sh "docker pull $dockerRegistry/fpmock2:latest"
+                    sh "docker pull $dockerRegistry/fpmock2:$vtpVersjon"
                 }
 
 
 
 
                 stage("Start VTP") {
-                    sh "docker run -d --name fpmock2 -p 8636:8636 -p 8063:8063 -p 8060:8060 -p 8001:8001 "+dockerRegistry+"/fpmock2:latest"
+                    sh "docker run -d --name fpmock2 -p 8636:8636 -p 8063:8063 -p 8060:8060 -p 8001:8001 "+dockerRegistry+"/fpmock2:$vtpVersjon"
                 }
 
                 stage("Start SUT") {
