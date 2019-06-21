@@ -91,11 +91,7 @@ def call(body) {
                     vtpVersjon = sh(script: "git ls-remote --tags git@vtp.github.com:navikt/vtp.git | sort -t '/' -k 3 -V | tail -2 | head -1 | grep -o '[^\\/]*\$'", returnStdout: true)?.trim();
 
                     println "Using VTP version '${vtpVersjon}'"
-/*
-                    if (maven.javaVersion() != null) {
-                        environment.overrideJDK(maven.javaVersion())
-                    }
-*/
+
                     def workspace = pwd()
                     def dsfile = workspace + "/resources/pipeline/" + applikasjon + "_datasource.list"
 
@@ -107,8 +103,6 @@ def call(body) {
 
 
                 stage("Cleanup docker ps og images") {
-                    sh('whoami')
-
                     sh 'docker stop $(docker ps -a -q) || true'
                     sh 'docker rm $(docker ps -a -q) || true'
                     sh 'docker rmi $(docker images -a -q) || true'
@@ -125,7 +119,13 @@ def call(body) {
 
 
                 stage("Start VTP") {
-                    sh "docker run -d --name fpmock2 -p 8636:8636 -p 8063:8063 -p 8060:8060 -p 8001:8001 "+dockerRegistry+"/fpmock2:$vtpVersjon"
+                    sh(script: "rm vpt.env")
+                    sh(script: "echo JAVAX_NET_SSL_TRUSTSTORE=.modig/truststore.jks >> vtp.env")
+                    sh(script: "echo JAVAX_NET_SSL_TRUSTSTOREPASSWORD=changeit >> vtp.env")
+                    sh(script: "echo NO_NAV_MODIG_SECURITY_APPCERT_PASSWORD=devillokeystore1234 >> vtp.env")
+                    sh(script: "echo NO_NAV_MODIG_SECURITY_APPCERT_KEYSTORE=.modig/keystore.jks >> vtp.env")
+
+                    sh "docker run -d --name --env-file vtp.env -v $workspace/.modig:/app/.modig fpmock2 -p 8636:8636 -p 8063:8063 -p 8060:8060 -p 8001:8001 ${dockerRegistry}/fpmock2:${vtpVersjon}"
                 }
 
                 stage("Start SUT") {
