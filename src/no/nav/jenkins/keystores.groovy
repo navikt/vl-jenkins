@@ -2,7 +2,7 @@ package no.nav.jenkins
 
 
 
-def generateKeystoreAndTruststore(){
+def generateKeystoreAndTruststore(String cnName){
     def SERVERKEYSTORE = "serverkeystore.p12"
     def CERT_PEM = "cert.pem"
     def KEY_PEM = "key.pem"
@@ -16,7 +16,7 @@ def generateKeystoreAndTruststore(){
     sh(script: "rm -rf ${KEYSTORE_FOLDER}")
     sh(script: "mkdir ${KEYSTORE_FOLDER}")
 
-    sh(script: "openssl req -x509 -newkey rsa:2048 -keyout ${KEY_PEM} -out ${CERT_PEM} -days 365 -nodes -subj '/CN=localhost'", returnStdout: true)
+    sh(script: "openssl req -x509 -newkey rsa:2048 -keyout ${KEY_PEM} -out ${CERT_PEM} -days 365 -nodes -subj '/CN=${cnName}'", returnStdout: true)
     sh(script: "openssl pkcs12 -export -name localhost-ssl -in ${CERT_PEM} -inkey ${KEY_PEM} -out ${SERVERKEYSTORE} -password pass:${KEYSTORE_PASS}", returnStdout:true)
     sh(script: "keytool -importkeystore -destkeystore ${KEYSTORE_FILE} -srckeystore ${SERVERKEYSTORE} -srcstoretype pkcs12 -alias localhost-ssl -storepass ${KEYSTORE_PASS} -keypass ${KEYSTORE_PASS} -srcstorepass ${KEYSTORE_PASS}", returnStdout:true)
     sh(script: "rm ${SERVERKEYSTORE}")

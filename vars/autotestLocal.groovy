@@ -114,7 +114,7 @@ def call(body) {
                 }
 
                 stage("Setup keystores"){
-                    keystores.generateKeystoreAndTruststore()
+                    keystores.generateKeystoreAndTruststore("fpmock2")
                 }
 
 
