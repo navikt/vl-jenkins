@@ -41,7 +41,7 @@ def call(body) {
 
         def console = new console()
         def dockerLokal = new dockerLocal()
-        def maven = new maven()
+        def keystores = new keystores()
 
         def mvnTestProperties = ["junit.jupiter.execution.parallel.enabled"                 : "true",
                                  "junit.jupiter.execution.parallel.config.strategy"         : "fixed",
@@ -120,7 +120,7 @@ def call(body) {
                 }
 
                 stage("Setup keystores"){
-                    sh (script: "vl-jenkins/bin/generate-keystore.sh", returnStdout: true)
+                    keystores.generateKeystoreAndTruststore()
                 }
 
 
