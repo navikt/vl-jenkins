@@ -119,7 +119,7 @@ def call(body) {
 
 
                 stage("Start VTP") {
-                    sh(script: "rm vpt.env")
+                    sh(script: "rm -f vpt.env")
                     sh(script: "echo JAVAX_NET_SSL_TRUSTSTORE=.modig/truststore.jks >> vtp.env")
                     sh(script: "echo JAVAX_NET_SSL_TRUSTSTOREPASSWORD=changeit >> vtp.env")
                     sh(script: "echo NO_NAV_MODIG_SECURITY_APPCERT_PASSWORD=devillokeystore1234 >> vtp.env")
