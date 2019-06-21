@@ -120,10 +120,10 @@ def call(body) {
 
                 stage("Start VTP") {
                     sh(script: "rm -f vpt.env")
-                    sh(script: "echo JAVAX_NET_SSL_TRUSTSTORE=.modig/truststore.jks >> vtp.env")
+                    sh(script: "echo JAVAX_NET_SSL_TRUSTSTORE=/root/.modig/truststore.jks >> vtp.env")
                     sh(script: "echo JAVAX_NET_SSL_TRUSTSTOREPASSWORD=changeit >> vtp.env")
                     sh(script: "echo NO_NAV_MODIG_SECURITY_APPCERT_PASSWORD=devillokeystore1234 >> vtp.env")
-                    sh(script: "echo NO_NAV_MODIG_SECURITY_APPCERT_KEYSTORE=.modig/keystore.jks >> vtp.env")
+                    sh(script: "echo NO_NAV_MODIG_SECURITY_APPCERT_KEYSTORE=/root/.modig/keystore.jks >> vtp.env")
 
                     sh "docker run -d --name fpmock2 --env-file vtp.env -v $workspace/.modig:/root/.modig -p 8636:8636 -p 8063:8063 -p 8060:8060 -p 8001:8001 ${dockerRegistry}/fpmock2:${vtpVersjon}"
                 }
