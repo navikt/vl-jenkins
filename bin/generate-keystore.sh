@@ -4,12 +4,12 @@ SERVERKEYSTORE=serverkeystore.p12
 CERT_PEM=cert.pem
 KEY_PEM=key.pem
 KEYSTORE_FILE=keystore.jks
-KEYSTORE_PASS=changeit
+KEYSTORE_PASS=devillokeystore1234
 TRUSTSTORE_FILE=truststore.jks
 TRUSTSTORE_PASS=changeit
 
-mkdir -p ~/.keystores
-cd ~/.keystores
+mkdir -p ~/.modig
+cd ~/.modig
 
 openssl req -x509 -newkey rsa:2048 -keyout ${KEY_PEM} -out ${CERT_PEM} -days 365 -nodes -subj '/CN=localhost'
 

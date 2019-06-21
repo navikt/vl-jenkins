@@ -119,7 +119,9 @@ def call(body) {
                     sh "docker pull $dockerRegistry/fpmock2:$vtpVersjon"
                 }
 
-
+                stage("Setup keystores"){
+                    sh (script: "vl-jenkins/bin/generate-keystore.sh", returnStdout: true)
+                }
 
 
                 stage("Start VTP") {
