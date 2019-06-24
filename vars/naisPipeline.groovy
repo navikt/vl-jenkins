@@ -71,7 +71,7 @@ def call() {
                             sh "mvn -B -Dfile.encoding=UTF-8 -DinstallAtEnd=true -DdeployAtEnd=true -Dsha1= -Dchangelist= -Drevision=$version clean install"
                             if(ARTIFACTID.equalsIgnoreCase("fpmock2")){
                                 echo("MVN deploy for fpmock2")
-                                sh "mvn -B -Dfile.encoding=UTF-8 -Dsha1= -Dchangelist= -Drevision=$version deploy"
+                                sh "mvn -B -Dfile.encoding=UTF-8 -Dsha1= -Dchangelist= -Drevision=$version clean install deploy"
                             }
                             sh "docker build --pull -t $dockerRegistryIapp/$ARTIFACTID:$version ."
                             withCredentials([[$class          : 'UsernamePasswordMultiBinding',
