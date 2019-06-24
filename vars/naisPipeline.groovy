@@ -112,34 +112,37 @@ def call() {
               }
               steps {
                   script {
-                      dir ('k8s') {
-                        def props = readProperties  interpolate: true, file: "application.${MILJO}.variabler.properties"
-                        def value = "s/RELEASE_VERSION/${version}/g"
-                        props.each{ k,v -> value=value+";s%$k%$v%g" }
-                        sh "k config use-context $props.CONTEXT_NAME"
-                        sh "sed \'$value\' app.yaml | k apply -f -"
+                      def k8exists = fileExists 'k8s'
+                      if (k8exists) {
+                          dir ('k8s') {
+                            def props = readProperties  interpolate: true, file: "application.${MILJO}.variabler.properties"
+                            def value = "s/RELEASE_VERSION/${version}/g"
+                            props.each{ k,v -> value=value+";s%$k%$v%g" }
+                            sh "k config use-context $props.CONTEXT_NAME"
+                            sh "sed \'$value\' app.yaml | k apply -f -"
 
-                        def naisNamespace
-                        if (MILJO == "p") {
-                            naisNamespace = "default"
-                        } else {
-                            naisNamespace = MILJO
-                        }
-                        def exitCode=sh returnStatus: true, script: "k rollout status -n${naisNamespace} deployment/${ARTIFACTID}"
-                        echo "exit code is $exitCode"
+                            def naisNamespace
+                            if (MILJO == "p") {
+                                naisNamespace = "default"
+                            } else {
+                                naisNamespace = MILJO
+                            }
+                            def exitCode=sh returnStatus: true, script: "k rollout status -n${naisNamespace} deployment/${ARTIFACTID}"
+                            echo "exit code is $exitCode"
 
-                        if(exitCode == 0) {
-                            def veraPayload = "{\"environment\": \"${MILJO}\",\"application\": \"${ARTIFACTID}\",\"version\": \"${version}\",\"deployedBy\": \"Jenkins\"}"
-                            def response = httpRequest([
-                                    url                   : "https://vera.adeo.no/api/v1/deploylog",
-                                    consoleLogResponseBody: true,
-                                    contentType           : "APPLICATION_JSON",
-                                    httpMode              : "POST",
-                                    requestBody           : veraPayload,
-                                    ignoreSslErrors       : true
-                            ])
-                        }
-                     }
+                            if(exitCode == 0) {
+                                def veraPayload = "{\"environment\": \"${MILJO}\",\"application\": \"${ARTIFACTID}\",\"version\": \"${version}\",\"deployedBy\": \"Jenkins\"}"
+                                def response = httpRequest([
+                                        url                   : "https://vera.adeo.no/api/v1/deploylog",
+                                        consoleLogResponseBody: true,
+                                        contentType           : "APPLICATION_JSON",
+                                        httpMode              : "POST",
+                                        requestBody           : veraPayload,
+                                        ignoreSslErrors       : true
+                                ])
+                            }
+                         }
+                      }
                   }
               }
            }
