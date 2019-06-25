@@ -67,12 +67,13 @@ def call() {
                             echo("envs: " + envs)
                             echo("artifact: " + ARTIFACTID)
 
-
-                            sh "mvn -B -Dfile.encoding=UTF-8 -DinstallAtEnd=true -DdeployAtEnd=true -Dsha1= -Dchangelist= -Drevision=$version clean install"
+                            mavenCommand = "mvn -B -Dfile.encoding=UTF-8 -DinstallAtEnd=true -DdeployAtEnd=true -Dsha1= -Dchangelist= -Drevision=$version clean install"
                             if(ARTIFACTID.equalsIgnoreCase("fpmock2")){
                                 echo("MVN deploy for fpmock2")
-                                sh "mvn -B -Dfile.encoding=UTF-8 -Dsha1= -Dchangelist= -Drevision=$version clean install deploy"
+                                mavenCommand = mavenCommand + " deploy"
                             }
+
+                            sh "${mavenCommand}"
                             sh "docker build --pull -t $dockerRegistryIapp/$ARTIFACTID:$version ."
                             withCredentials([[$class          : 'UsernamePasswordMultiBinding',
                                               credentialsId   : 'nexusUser',
