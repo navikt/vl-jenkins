@@ -151,12 +151,15 @@ def call(body) {
                 }
 
                 stage("Start SUT") {
+                    sh(script: "rm -f sut.env")
+                    sh(script: "echo EXTRA_CLASS_PATH=:vtp-lib/*")
+
                     def workspace = pwd()
                     //def host_ip = sh(script:"ip route show 0.0.0.0/0 | grep -Eo 'via \\S+' | awk '{ print \$2 }'", returnStdout: true)
                     def host_ip = InetAddress.localHost.hostAddress
                     println host_ip
 
-                    sh "docker run -d --name $applikasjon --add-host=host.docker.internal:${host_ip} -v $workspace/resources/pipeline/keystore:/var/run/secrets/naisd.io/ --env-file $workspace/resources/pipeline/autotest.list --env-file $workspace/resources/pipeline/" + params.applikasjon + "_datasource.list -p 8080:8080 -p 8000:8000 --link fpmock2:fpmock2 "+dockerRegistry+"/$applikasjon:$sutToRun"
+                    sh "docker run -d --name $applikasjon --add-host=host.docker.internal:${host_ip} -v $workspace/resources/pipeline/keystore:/var/run/secrets/naisd.io/ --env-file sut.env  --env-file $workspace/resources/pipeline/autotest.list --env-file $workspace/resources/pipeline/" + params.applikasjon + "_datasource.list -p 8080:8080 -p 8000:8000 --link fpmock2:fpmock2 "+dockerRegistry+"/$applikasjon:$sutToRun"
                 }
 
                 stage("Verifiserer VTP") {
