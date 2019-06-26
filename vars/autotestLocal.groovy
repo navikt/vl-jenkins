@@ -113,6 +113,28 @@ def call(body) {
                     sh "docker pull $dockerRegistry/fpmock2:$vtpVersjon"
                 }
 
+                stage("Clean db") {
+                    if (params.clean) {
+                        println("Her skal det ryddes.. Når klart")
+                        //sh "$workspace/resources/pipeline/" + params.applikasjon + "_datasource.list"
+                        String path = "${workspace}/resources/pipeline/${params.applikasjon}_datasource.list"
+                        println(path)
+                        //TODO: Split til Hashmap med kodeverdier for brukernavn, DB_URL og passord for database. Lag input til flyway clean.
+                        String dbConfig = readFile(path)
+                        def configMap = dbConfig.split("\n").collectEntries { entry ->
+                            def pair = entry.split("=")
+                            [(pair.first()): pair.last()]
+                        }
+
+                        String flywayCleanString = "-user=${configMap.DEFAULTDS_USERNAME} -password=${configMap.DEFAULTDS_PASSWORD} -url=${configMap.DEFAULTDS_URL} clean"
+                        println("Running clean command")
+                        sh "flyway $flywayCleanString"
+                        println("Clean command finished")
+
+                    }
+                }
+
+
                 stage("Setup keystores"){
                     keystores.generateKeystoreAndTruststore("fpmock2")
                 }
