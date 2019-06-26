@@ -152,7 +152,7 @@ def call(body) {
 
                 stage("Start SUT") {
                     sh(script: "rm -f sut.env")
-                    sh(script: "echo EXTRA_CLASS_PATH=:vtp-lib/*")
+                    sh(script: "echo EXTRA_CLASS_PATH=:vtp-lib/* >> sut.env")
 
                     def workspace = pwd()
                     //def host_ip = sh(script:"ip route show 0.0.0.0/0 | grep -Eo 'via \\S+' | awk '{ print \$2 }'", returnStdout: true)
