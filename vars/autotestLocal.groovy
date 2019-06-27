@@ -147,7 +147,7 @@ def call(body) {
                     sh(script: "echo NO_NAV_MODIG_SECURITY_APPCERT_PASSWORD=devillokeystore1234 >> vtp.env")
                     sh(script: "echo NO_NAV_MODIG_SECURITY_APPCERT_KEYSTORE=/root/.modig/keystore.jks >> vtp.env")
 
-                    sh "docker run -d --name fpmock2 --env-file vtp.env -v $workspace/.modig:/root/.modig -p 8636:8636 -p 8063:8063 -p 8060:8060 -p 8001:8001 ${dockerRegistry}/fpmock2:${vtpVersjon}"
+                    sh "docker run -d --name fpmock2 --env-file vtp.env -v $workspace/.modig:/root/.modig -p 8636:8636 -p 8063:8063 -p 8060:8060 -p 8001:8001  ${dockerRegistry}/fpmock2:${vtpVersjon}"
                 }
 
                 stage("Start SUT") {
@@ -174,7 +174,6 @@ def call(body) {
                         println("VTP ikke klar, venter $vent sekunder...")
                         println("VTP retry $vtpRetry av $retryLimit")
                         vtpRetry++
-                        sleep(vent)
                     }
 
                 }
@@ -191,7 +190,6 @@ def call(body) {
                         println("SUT $applikasjon ikke klar, venter $vent sekunder...")
                         println("SUT retry $sutRetry av $retryLimit")
                         sutRetry++
-                        sleep(vent)
                     }
                 }
 
@@ -200,9 +198,9 @@ def call(body) {
                         configFileProvider([configFile(fileId: 'navMavenSettings', variable: 'MAVEN_SETTINGS')]) {
                             def workspace = pwd()
 
-                            sh 'export AUTOTEST_ENV=pipeline && export ENABLE_CUSTOM_TRUSTSTORE=true && export CUSTOM_KEYSTORE_PASSWORD=changeit ' +
-                                    "export CUSTOM_KEYSTORE_PATH=$workspace/resources/pipeline/keystore/vtpkeystore" +
-                                    '&& mvn test -pl :autotest,:core,:dokumentgenerator -s $MAVEN_SETTINGS -P ' + profil + ' ' + mavenArgs + ' -T 2C -DargLine="AUTOTEST_ENV=pipeline" -DargLine="isso.oauth2.issuer=https://fpmock2:8063/rest/isso/oauth2"'
+                            sh 'export AUTOTEST_ENV=pipeline && ' +
+                                    "export CUSTOM_KEYSTORE_PATH=$workspace/.modig" +
+                                    '&& mvn test -s $MAVEN_SETTINGS -P ' + profil + ' ' + mavenArgs + ' -DargLine="AUTOTEST_ENV=pipeline" -DargLine="isso.oauth2.issuer=https://fpmock2:8063/rest/isso/oauth2"'
                         }
 
                     } catch (error) {
