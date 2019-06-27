@@ -199,7 +199,7 @@ def call(body) {
                 stage("Kjør test") {
                     try {
                         configFileProvider([configFile(fileId: 'navMavenSettings', variable: 'MAVEN_SETTINGS')]) {
-                            def workspace = pwd()
+                            println "Workspace = " + workspace
 
                             sh 'export AUTOTEST_ENV=pipeline && ' +
                                     "export CUSTOM_KEYSTORE_PATH=$workspace/.modig" +
