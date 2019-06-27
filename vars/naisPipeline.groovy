@@ -8,10 +8,6 @@ def call() {
     def GIT_COMMIT_HASH_FULL
 
     pipeline {
-        tools {
-            jdk '11'
-            maven 'maven-3.6.1'
-        }
         //agent any
         agent { label 'MASTER' }
         parameters {
@@ -52,7 +48,6 @@ def call() {
 
             stage('Set version') {
                 steps {
-                    sh "mvn --version"
                     sh "echo $version > VERSION"
                 }
             }
@@ -66,7 +61,7 @@ def call() {
                             if (maven.javaVersion() != null) {
                                 buildEnvironment.overrideJDK(maven.javaVersion())
                             }
-
+                            sh "mvn --version"
                             envs = sh(returnStdout: true, script: 'env | sort -h').trim()
                             echo("envs: " + envs)
                             echo("artifact: " + ARTIFACTID)
