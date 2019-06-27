@@ -190,6 +190,8 @@ def call(body) {
                         println("SUT $applikasjon ikke klar, venter $vent sekunder...")
                         println("SUT retry $sutRetry av $retryLimit")
                         sutRetry++
+                        sleep(vent)
+
                     }
                 }
 
