@@ -201,8 +201,7 @@ def call(body) {
                             println "Workspace = " + workspace
 
                             sh 'export AUTOTEST_ENV=pipeline && ' +
-                                    "export CUSTOM_KEYSTORE_PATH=$workspace/.modig" +
-                                    '&& mvn test -s $MAVEN_SETTINGS -P ' + profil + ' ' + mavenArgs + ' -DargLine="AUTOTEST_ENV=pipeline" -DargLine="isso.oauth2.issuer=https://fpmock2:8063/rest/isso/oauth2"'
+                                    ' mvn test -s $MAVEN_SETTINGS -P ' + profil + ' ' + mavenArgs + ' -DargLine="AUTOTEST_ENV=pipeline" -DargLine="isso.oauth2.issuer=https://fpmock2:8063/rest/isso/oauth2"'
                         }
 
                     } catch (error) {
