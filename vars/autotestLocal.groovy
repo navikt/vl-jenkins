@@ -105,7 +105,6 @@ def call(body) {
                 stage("Cleanup docker ps og images") {
                     sh 'docker stop $(docker ps -a -q) || true'
                     sh 'docker rm $(docker ps -a -q) || true'
-                    sh 'docker rmi $(docker images -a -q) || true'
                 }
 
                 stage("Pull") {
