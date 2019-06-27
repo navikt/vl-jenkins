@@ -8,6 +8,10 @@ def call() {
     def GIT_COMMIT_HASH_FULL
 
     pipeline {
+        tools {
+            jdk '11'
+            maven 'maven-3.6.1'
+        }
         //agent any
         agent { label 'MASTER' }
         parameters {
