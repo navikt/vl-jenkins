@@ -15,7 +15,8 @@ def sjekkLokalVtpStatus(){
 
 def sjekkHttp200(String requestString){
     try{
-        def response = httpRequest(requestString)
+        def response = httpRequest(url: requestString, timeout: 120)
+
         if(response.status == 200){
             println "Response fra $requestString ok"
             return true
