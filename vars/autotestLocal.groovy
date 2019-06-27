@@ -196,16 +196,20 @@ def call(body) {
                 }
 
                 stage("Kjør test") {
-                    sh(script: "export JAVAX_NET_SSL_TRUSTSTORE=${workspace}/.modig/truststore.jks")
-                    sh(script: "export JAVAX_NET_SSL_TRUSTSTOREPASSWORD=changeit")
-                    sh(script: "export NO_NAV_MODIG_SECURITY_APPCERT_PASSWORD=devillokeystore1234")
-                    sh(script: "export NO_NAV_MODIG_SECURITY_APPCERT_KEYSTORE=${workspace}/.modig/keystore.jks")
+
                     try {
                         configFileProvider([configFile(fileId: 'navMavenSettings', variable: 'MAVEN_SETTINGS')]) {
                             println "Workspace = " + workspace
 
+                            sh(script: "export JAVAX_NET_SSL_TRUSTSTORE=${workspace}/.modig/truststore.jks")
+                            sh(script: "export JAVAX_NET_SSL_TRUSTSTOREPASSWORD=changeit")
+                            sh(script: "export NO_NAV_MODIG_SECURITY_APPCERT_PASSWORD=devillokeystore1234")
+                            sh(script: "export NO_NAV_MODIG_SECURITY_APPCERT_KEYSTORE=${workspace}/.modig/keystore.jks")
+
                             sh 'export AUTOTEST_ENV=pipeline && ' +
-                                    ' mvn test -s $MAVEN_SETTINGS -P ' + profil + ' ' + mavenArgs + ' -DargLine="AUTOTEST_ENV=pipeline" -DargLine="isso.oauth2.issuer=https://fpmock2:8063/rest/isso/oauth2"'
+                                    "export NO_NAV_MODIG_SECURITY_APPCERT_KEYSTORE=${workspace}/.modig/keystore.jks && " +
+                                    'export NO_NAV_MODIG_SECURITY_APPCERT_PASSWORD=devillokeystore1234 && ' +
+                                    ' mvn test -s $MAVEN_SETTINGS -P ' + profil + ' ' + mavenArgs + ' -DargLine="AUTOTEST_ENV=pipepipe" -DargLine="isso.oauth2.issuer=https://fpmock2:8063/rest/isso/oauth2"'
                         }
 
                     } catch (error) {
