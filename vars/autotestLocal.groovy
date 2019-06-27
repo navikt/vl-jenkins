@@ -196,6 +196,10 @@ def call(body) {
                 }
 
                 stage("Kjør test") {
+                    sh(script: "export JAVAX_NET_SSL_TRUSTSTORE=${workspace}/.modig/truststore.jks")
+                    sh(script: "export JAVAX_NET_SSL_TRUSTSTOREPASSWORD=changeit")
+                    sh(script: "export NO_NAV_MODIG_SECURITY_APPCERT_PASSWORD=devillokeystore1234")
+                    sh(script: "export NO_NAV_MODIG_SECURITY_APPCERT_KEYSTORE=${workspace}/.modig/keystore.jks")
                     try {
                         configFileProvider([configFile(fileId: 'navMavenSettings', variable: 'MAVEN_SETTINGS')]) {
                             println "Workspace = " + workspace
