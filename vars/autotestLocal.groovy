@@ -174,6 +174,7 @@ def call(body) {
                         println("VTP ikke klar, venter $vent sekunder...")
                         println("VTP retry $vtpRetry av $retryLimit")
                         vtpRetry++
+                        sleep(vent)
                     }
 
                 }
