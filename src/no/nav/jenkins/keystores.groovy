@@ -40,7 +40,7 @@ DNS.1 = fpmock2
     sh(script: "rm -rf ${KEYSTORE_FOLDER}")
     sh(script: "mkdir ${KEYSTORE_FOLDER}")
     sh(script: "rm -f csr_config.txt || true", returnStdout: true)
-    sh(script: "cat >> csr_config.txt <<EOL ${CSR_DETAILS} EOL")
+    sh(script: "echo \"${CSR_DETAILS}\" >> csr_config.txt ")
     sh(script: "openssl req -x509 -newkey rsa:2048 -keyout ${KEY_PEM} -out ${CERT_PEM} -days 365 -nodes -config csr_config.txt", returnStdout: true)
     sh(script: "openssl pkcs12 -export -name localhost-ssl -in ${CERT_PEM} -inkey ${KEY_PEM} -out ${SERVERKEYSTORE} -password pass:${KEYSTORE_PASS}", returnStdout:true)
     sh(script: "keytool -importkeystore -destkeystore ${KEYSTORE_FILE} -srckeystore ${SERVERKEYSTORE} -srcstoretype pkcs12 -alias localhost-ssl -storepass ${KEYSTORE_PASS} -keypass ${KEYSTORE_PASS} -srcstorepass ${KEYSTORE_PASS}", returnStdout:true)
