@@ -209,6 +209,7 @@ def call(body) {
                             sh 'export AUTOTEST_ENV=pipeline && ' +
                                     "export NO_NAV_MODIG_SECURITY_APPCERT_KEYSTORE=${workspace}/.modig/keystore.jks && " +
                                     'export NO_NAV_MODIG_SECURITY_APPCERT_PASSWORD=devillokeystore1234 && ' +
+                                    'export IS_PIPELINE=true && ' +
                                     ' mvn test -s $MAVEN_SETTINGS -P ' + profil + ' ' + mavenArgs + ' -DargLine="AUTOTEST_ENV=pipepipe" -DargLine="isso.oauth2.issuer=https://fpmock2:8063/rest/isso/oauth2"'
                         }
 

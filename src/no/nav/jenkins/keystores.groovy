@@ -13,27 +13,29 @@ def generateKeystoreAndTruststore(String cnName){
     def KEYSTORE_FOLDER = ".modig"
 
     def CSR_DETAILS = """
-[req]
+[ req ]
 default_bits = 2048
 prompt = no
 default_md = sha256
-req_extensions = req_ext
+x509_extensions = v3_req
 distinguished_name = dn
 
 [ dn ]
 C=NO
 ST=Oslo
 L=Oslo
-O=Test TEst
+O=Test Test
 OU=Testing Domain
 emailAddress=test@vtp.com
 CN = ${cnName}
 
-[ req_ext ]
+[ v3_req ]
 subjectAltName = @alt_names
-
+keyUsage = keyEncipherment, dataEncipherment
+extendedKeyUsage = serverAuth
 [ alt_names ]
 DNS.1 = fpmock2
+DNS.2 = fpsak
 """
 
     // local-host SSL
