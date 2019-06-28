@@ -39,7 +39,6 @@ DNS.1 = fpmock2
     // local-host SSL
     sh(script: "rm -rf ${KEYSTORE_FOLDER}")
     sh(script: "mkdir ${KEYSTORE_FOLDER}")
-    sh(script: "rm -f csr_config.txt", returnStdout: true)
     def file = new File("csr_config.txt")
     file.write(CSR_DETAILS)
     sh(script: "openssl req -x509 -newkey rsa:2048 -keyout ${KEY_PEM} -out ${CERT_PEM} -days 365 -nodes -config csr_config.txt", returnStdout: true)
