@@ -1,13 +1,17 @@
 import no.nav.jenkins.*
 
 def call() {
-    def maven = new maven()
+    def mvn = new maven()
     def appName = ''
     def exitCode
     def naisAppImage = ''
     def deployedVersionTag = ''
 
     pipeline {
+        tools {
+            jdk '11'
+            maven 'maven-3.6.1'
+        }
         agent none
         stages {
             stage('Hent appName') {
@@ -15,7 +19,7 @@ def call() {
                 steps {
                     script {
                         if (fileExists('pom.xml')) {
-                            appName = maven.artifactId()
+                            appName = mvn.artifactId()
                         }
                         else {
                             appName = sh(script: "basename -s .git `git config --get remote.origin.url`", returnStdout: true).trim()
