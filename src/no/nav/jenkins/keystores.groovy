@@ -50,7 +50,7 @@ DNS.2 = fpsak
 
 
     // app-key (jwt uststeder bl.a. i mocken, vi bruker samme noekkel per naa):
-    sh(script: "openssl pkcs12 -export -name app-key -in ${CERT_PEM} -inkey ${KEY_PEM} -out ${SERVERKEYSTORE} -subj \"/CN=localhost\" -password pass:${KEYSTORE_PASS}", returnStdout:true)
+    sh(script: "openssl pkcs12 -export -name app-key -in ${CERT_PEM} -inkey ${KEY_PEM} -out ${SERVERKEYSTORE} -subj '/CN=localhost' -password pass:${KEYSTORE_PASS}", returnStdout:true)
     sh(script: "keytool -importkeystore -destkeystore ${KEYSTORE_FILE} -srckeystore ${SERVERKEYSTORE} -srcstoretype pkcs12 -alias app-key -storepass ${KEYSTORE_PASS} -keypass ${KEYSTORE_PASS} -srcstorepass ${KEYSTORE_PASS}", returnStdout:true)
 
     // truststore for SSL:
