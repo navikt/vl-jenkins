@@ -10,6 +10,10 @@ def call() {
     def exitCode
 
     pipeline {
+        tools {
+            jdk '11'
+            maven 'maven-3.6.1'
+        }
         agent none
         stages {
             stage('Checkout scm') {
