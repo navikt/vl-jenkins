@@ -1,7 +1,7 @@
 import no.nav.jenkins.*
 
 def call() {
-    def maven = new maven()
+    def mvn = new maven()
     def fpgithub = new fpgithub()
     def version
     def githubRepoName
@@ -27,10 +27,10 @@ def call() {
                         gitCommitHasdh = sh(script: "git log -n 1 --pretty=format:'%h'", returnStdout: true)
                         GIT_COMMIT_HASH_FULL = sh(script: "git log -n 1 --pretty=format:'%H'", returnStdout: true)
                         changelist = "_" + date.format("YYYYMMddHHmmss") + "_" + gitCommitHasdh
-                        mRevision = maven.revision()
+                        mRevision = mvn.revision()
                         version = mRevision + changelist
                         githubRepoName = sh(script: "basename -s .git `git config --get remote.origin.url`", returnStdout: true).trim()
-                        artifactId = maven.artifactId()
+                        artifactId = mvn.artifactId()
                         currentBuild.displayName = version
 
                         echo "Building $version"
@@ -56,8 +56,8 @@ def call() {
                         withMaven (mavenSettingsConfig: 'navMavenSettings') {
                             buildEnvironment = new buildEnvironment()
 
-                            if (maven.javaVersion() != null) {
-                                buildEnvironment.overrideJDK(maven.javaVersion())
+                            if (mvn.javaVersion() != null) {
+                                buildEnvironment.overrideJDK(mvn.javaVersion())
                             }
 
                             sh "mvn -B -Dfile.encoding=UTF-8 -DinstallAtEnd=true -DdeployAtEnd=true -Dsha1= -Dchangelist= -Drevision=$version clean install"
