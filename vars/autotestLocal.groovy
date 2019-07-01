@@ -146,7 +146,7 @@ def call(body) {
                     sh(script: "echo JAVAX_NET_SSL_TRUSTSTOREPASSWORD=changeit >> vtp.env")
                     sh(script: "echo NO_NAV_MODIG_SECURITY_APPCERT_PASSWORD=devillokeystore1234 >> vtp.env")
                     sh(script: "echo NO_NAV_MODIG_SECURITY_APPCERT_KEYSTORE=/root/.modig/keystore.jks >> vtp.env")
-                    sh(script: "echo VTP_KAFKA_HOST=fpmock2:9093 >> vtp.env")
+                    sh(script: "echo VTP_KAFKA_HOST=localhost:9093 >> vtp.env")
 
 
                     sh "docker run -d --name fpmock2 --env-file vtp.env -v $workspace/.modig:/root/.modig -p 8636:8636 -p 8063:8063 -p 8060:8060 -p 8001:8001 -p 9093:9093  ${dockerRegistry}/fpmock2:${vtpVersjon}"
