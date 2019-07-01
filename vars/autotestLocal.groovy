@@ -43,6 +43,7 @@ def call(body) {
         def dockerLokal = new dockerLocal()
         def keystores = new keystores()
 
+        //Deaktivert p.g.a ex-base
         def mvnTestProperties = ["junit.jupiter.execution.parallel.enabled"                 : "true",
                                  "junit.jupiter.execution.parallel.config.strategy"         : "fixed",
                                  "junit.jupiter.execution.parallel.config.fixed.parallelism": "4"]
@@ -210,7 +211,7 @@ def call(body) {
                                     "export NO_NAV_MODIG_SECURITY_APPCERT_KEYSTORE=${workspace}/.modig/keystore.jks && " +
                                     'export NO_NAV_MODIG_SECURITY_APPCERT_PASSWORD=devillokeystore1234 && ' +
                                     'export IS_PIPELINE=true && ' +
-                                    ' mvn test -s $MAVEN_SETTINGS -P ' + profil + ' ' + mavenArgs + ' -DargLine="AUTOTEST_ENV=pipepipe" -DargLine="isso.oauth2.issuer=https://fpmock2:8063/rest/isso/oauth2"'
+                                    ' mvn test -s $MAVEN_SETTINGS -P ' + profil + ' -DargLine="AUTOTEST_ENV=pipepipe" -DargLine="isso.oauth2.issuer=https://fpmock2:8063/rest/isso/oauth2"'
                         }
 
                     } catch (error) {
