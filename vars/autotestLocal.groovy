@@ -139,7 +139,6 @@ def call(body) {
                     keystores.generateKeystoreAndTruststore("fpmock2")
                 }
 
-
                 stage("Start VTP") {
                     sh(script: "rm -f vpt.env")
                     sh(script: "echo JAVAX_NET_SSL_TRUSTSTORE=/root/.modig/truststore.jks >> vtp.env")
@@ -220,8 +219,8 @@ def call(body) {
                         currentBuild.result = 'FAILURE'
                         //slackSend color: "danger", message: ":collision: Autotest med profil _${params.context}_ feilet. Se ${env.BUILD_URL} for hvilke tester som feiler."
                     } finally {
-                        archiveArtifacts "autotest/target/**/*"
-                        junit 'autotest/target/surefire-reports/*.xml'
+                        archiveArtifacts "target/**/*"
+                        junit 'target/surefire-reports/*.xml'
                         allure([
                                 includeProperties: true,
                                 jdk              : '',
@@ -230,7 +229,7 @@ def call(body) {
                                         [reportVersion: "2.7.0"]
                                 ],
                                 reportBuildPolicy: 'ALWAYS',
-                                results          : [[path: 'autotest/target/allure-results']]
+                                results          : [[path: 'target/allure-results']]
                         ])
 
                     }
