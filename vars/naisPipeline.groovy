@@ -147,8 +147,13 @@ def call() {
                 }
             }
             stage('Start autotest dispatcher') {
+                when {
+                    branch 'master'
+                }
                 steps {
-                    build job: 'autotest-dispatcher', parameters: [[application: $ { ARTIFACTID }, version: ${version}]], wait: false
+                    script {
+                        build job: 'autotest-dispatcher', parameters: [[application: ${ARTIFACTID}, version: ${version}]], wait: false
+                    }
                 }
             }
         }
