@@ -152,7 +152,10 @@ def call() {
                 }
                 steps {
                     script {
-                        build job: 'autotest-dispatcher', parameters: [[application: "${ARTIFACTID}", version: "${version}"]], wait: false
+                        build job: 'autotest-dispatcher', parameters: [
+                                [$class: 'StringParameterValue', name:  'application', value: "${ARTIFACTID}"],
+                                [$class: 'StringParameterValue', name:  'version', value: "${version}"]
+                        ], wait: false
                     }
                 }
             }
