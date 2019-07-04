@@ -34,7 +34,6 @@ def call(body) {
                 string(defaultValue: '', description: 'Overstyr profil - default er applikasjonsnavn', name: 'profil'),
                 string(defaultValue: '', description: 'Changelog fra upstream job', name: 'changelog'),
                 booleanParam(defaultValue: false, description: 'Clean av SUT databasen', name: 'clean'),
-                string(defaultValue: '', description: 'Denne jobben skal ikke kjøres manuelt', name: 'runkey'),
                 booleanParam(defaultValue: false, description: 'Releasekandidat?', name: 'rc')
         ])
         ])
@@ -64,12 +63,6 @@ def call(body) {
         }
 
         node('VTPAUTOTEST') {
-
-            if (runkey != "gandalf") {
-                println("Fikk verdi ${runkey}")
-                println("Ugyldig forsøk på å bygge jobb")
-                exit 1
-            }
 
             try {
                 env.LANG = "nb_NO.UTF-8"
