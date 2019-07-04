@@ -40,7 +40,6 @@ def call(body) {
                         build job: 'autotest-fpsak', parameters: params
                     } else {
                         println("Applikasjonen ${application} støttes ikke")
-                        exit 1
                     }
                 }
 
