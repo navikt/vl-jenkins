@@ -14,6 +14,8 @@ def call(body) {
         ])
         ])
 
+        println properties
+
         params = [
                 [$class: 'StringParameterValue', name: 'applikasjon', value: application],
                 [$class: 'StringParameterValue', name: 'applikasjonVersjon', value: version],
