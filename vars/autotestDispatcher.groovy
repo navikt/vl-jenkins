@@ -5,8 +5,8 @@ def call(body) {
 
     timestamps {
         properties([disableConcurrentBuilds(), parameters([
-                string(defaultValue: '', description: 'Applikasjon SUT, f.eks fpsak', name: 'applikasjon'),
-                string(defaultValue: '', description: 'SUT Versjon', name: 'applikasjonVersjon'),
+                string(defaultValue: '', description: 'Applikasjon SUT, f.eks fpsak', name: 'application'),
+                string(defaultValue: '', description: 'SUT Versjon', name: 'version'),
                 string(defaultValue: '', description: 'Overstyr profil - default er applikasjonsnavn', name: 'profil'),
                 string(defaultValue: '', description: 'Changelog fra upstream job', name: 'changelog'),
                 booleanParam(defaultValue: false, description: 'Clean av SUT databasen', name: 'clean'),

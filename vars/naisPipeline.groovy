@@ -146,6 +146,11 @@ def call() {
                   }
               }
            }
+            stage('Start autotest dispatcher'){
+                when {
+                    build job: 'autotest-dispatcher', parameters: [[application: ${ARTIFACTID}, version: ${version}]], wait: false
+                }
+            }
         }
     }
 }
