@@ -15,8 +15,8 @@ def call(body) {
         ])
 
         params = [
-                [$class: 'StringParameterValue', name: 'applikasjon', value: applikasjon],
-                [$class: 'StringParameterValue', name: 'applikasjonVersjon', value: applikasjonVersjon],
+                [$class: 'StringParameterValue', name: 'applikasjon', value: application],
+                [$class: 'StringParameterValue', name: 'applikasjonVersjon', value: version],
                 [$class: 'StringParameterValue', name: 'profil', value: profil],
                 [$class: 'StringParameterValue', name: 'changelog', value: changelog],
                 [$class: 'BooleanParameterValue', name: 'rc', value: rc],
@@ -33,11 +33,11 @@ def call(body) {
 
 
                 stage("Starter test for applikasjon") {
-                    println("Starter applikasjon: ${applikasjon} med versjon: ${applikasjonVersjon} ")
-                    if (applikasjon == 'fpsak') {
+                    println("Starter applikasjon: ${application} med versjon: ${version} ")
+                    if (application == 'fpsak') {
                         build job: 'autotest-fpsak', parameters: params
                     } else {
-                        println("Applikasjonen ${applikasjon} støttes ikke")
+                        println("Applikasjonen ${application} støttes ikke")
                         exit 1
                     }
                 }
