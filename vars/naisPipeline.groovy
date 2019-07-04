@@ -11,10 +11,10 @@ def call() {
         //agent any
         agent { label 'MASTER' }
         parameters {
-          string(defaultValue: 't4', description: '', name: 'miljo')
+            string(defaultValue: 't4', description: '', name: 'miljo')
         }
         options {
-          timestamps()
+            timestamps()
         }
         environment {
             DOCKERREGISTRY = "repo.adeo.no:5443"
@@ -55,7 +55,7 @@ def call() {
             stage('Build') {
                 steps {
                     script {
-                        withMaven (mavenSettingsConfig: 'navMavenSettings') {
+                        withMaven(mavenSettingsConfig: 'navMavenSettings') {
                             buildEnvironment = new buildEnvironment()
                             buildEnvironment.setEnv()
                             if (maven.javaVersion() != null) {
@@ -67,7 +67,7 @@ def call() {
                             echo("artifact: " + ARTIFACTID)
 
                             mavenCommand = "mvn -B -Dfile.encoding=UTF-8 -DinstallAtEnd=true -DdeployAtEnd=true -Dsha1= -Dchangelist= -Drevision=$version clean install"
-                            if(ARTIFACTID.equalsIgnoreCase("fpmock2")){
+                            if (ARTIFACTID.equalsIgnoreCase("fpmock2")) {
                                 echo("MVN deploy for fpmock2")
                                 mavenCommand = mavenCommand + " deploy"
                             }
@@ -107,48 +107,48 @@ def call() {
                 }
             }
             stage('Deploy') {
-              when {
-                  branch 'master'
-              }
-              steps {
-                  script {
-                      def k8exists = fileExists 'k8s'
-                      if (k8exists) {
-                          dir ('k8s') {
-                            def props = readProperties  interpolate: true, file: "application.${MILJO}.variabler.properties"
-                            def value = "s/RELEASE_VERSION/${version}/g"
-                            props.each{ k,v -> value=value+";s%$k%$v%g" }
-                            sh "k config use-context $props.CONTEXT_NAME"
-                            sh "sed \'$value\' app.yaml | k apply -f -"
-
-                            def naisNamespace
-                            if (MILJO == "p") {
-                                naisNamespace = "default"
-                            } else {
-                                naisNamespace = MILJO
-                            }
-                            def exitCode=sh returnStatus: true, script: "k rollout status -n${naisNamespace} deployment/${ARTIFACTID}"
-                            echo "exit code is $exitCode"
-
-                            if(exitCode == 0) {
-                                def veraPayload = "{\"environment\": \"${MILJO}\",\"application\": \"${ARTIFACTID}\",\"version\": \"${version}\",\"deployedBy\": \"Jenkins\"}"
-                                def response = httpRequest([
-                                        url                   : "https://vera.adeo.no/api/v1/deploylog",
-                                        consoleLogResponseBody: true,
-                                        contentType           : "APPLICATION_JSON",
-                                        httpMode              : "POST",
-                                        requestBody           : veraPayload,
-                                        ignoreSslErrors       : true
-                                ])
-                            }
-                         }
-                      }
-                  }
-              }
-           }
-            stage('Start autotest dispatcher'){
                 when {
-                    build job: 'autotest-dispatcher', parameters: [[application: ${ARTIFACTID}, version: ${version}]], wait: false
+                    branch 'master'
+                }
+                steps {
+                    script {
+                        def k8exists = fileExists 'k8s'
+                        if (k8exists) {
+                            dir('k8s') {
+                                def props = readProperties interpolate: true, file: "application.${MILJO}.variabler.properties"
+                                def value = "s/RELEASE_VERSION/${version}/g"
+                                props.each { k, v -> value = value + ";s%$k%$v%g" }
+                                sh "k config use-context $props.CONTEXT_NAME"
+                                sh "sed \'$value\' app.yaml | k apply -f -"
+
+                                def naisNamespace
+                                if (MILJO == "p") {
+                                    naisNamespace = "default"
+                                } else {
+                                    naisNamespace = MILJO
+                                }
+                                def exitCode = sh returnStatus: true, script: "k rollout status -n${naisNamespace} deployment/${ARTIFACTID}"
+                                echo "exit code is $exitCode"
+
+                                if (exitCode == 0) {
+                                    def veraPayload = "{\"environment\": \"${MILJO}\",\"application\": \"${ARTIFACTID}\",\"version\": \"${version}\",\"deployedBy\": \"Jenkins\"}"
+                                    def response = httpRequest([
+                                            url                   : "https://vera.adeo.no/api/v1/deploylog",
+                                            consoleLogResponseBody: true,
+                                            contentType           : "APPLICATION_JSON",
+                                            httpMode              : "POST",
+                                            requestBody           : veraPayload,
+                                            ignoreSslErrors       : true
+                                    ])
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            stage('Start autotest dispatcher') {
+                steps {
+                    build job: 'autotest-dispatcher', parameters: [[application: $ { ARTIFACTID }, version: ${version}]], wait: false
                 }
             }
         }
