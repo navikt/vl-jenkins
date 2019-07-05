@@ -39,7 +39,7 @@ def call(body) {
                 stage("Starter test for applikasjon") {
                     println("Starter applikasjon: ${application} med versjon: ${version} ")
                     if (supportedApps.contains(application)) {
-                        build job: 'autotest-fpsak', parameters: params
+                        build job: "autotest-${application}", parameters: params
                     } else {
                         println("Applikasjonen ${application} støttes ikke")
                     }
