@@ -242,7 +242,7 @@ def call(body) {
 
                     //TODO: Fjern eksplisitt sjekk på FPSAK når SPBEREGNING også er rapporterbar
                     echo "currentBuild.result er: " + currentBuild.result
-                    def allureUrl = "http://jenkins-familie.adeo.no/job/autotest-${applikasjon}/${env.BUILD_NUMBER}/allure/"
+                    def allureUrl = "https://jenkins-familie.adeo.no/job/autotest-${applikasjon}/${env.BUILD_NUMBER}/allure/"
 
 
                     def testStatus = makeTestStatus(currentBuild.rawBuild.getAction(AbstractTestResultAction.class), allureUrl)
