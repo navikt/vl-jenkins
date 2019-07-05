@@ -25,6 +25,8 @@ def call(body) {
                 [$class: 'BooleanParameterValue', name: 'clean', value: clean]
         ]
 
+        supportedApps = ["fpsak","spberegning"]
+
 
         node('VTPAUTOTEST') {
             try {
@@ -36,7 +38,7 @@ def call(body) {
 
                 stage("Starter test for applikasjon") {
                     println("Starter applikasjon: ${application} med versjon: ${version} ")
-                    if (application == 'fpsak') {
+                    if (supportedApps.contains(application)) {
                         build job: 'autotest-fpsak', parameters: params
                     } else {
                         println("Applikasjonen ${application} støttes ikke")
