@@ -12,7 +12,7 @@ def call() {
     pipeline {
         tools {
             jdk '11'
-            maven 'maven-3.6.1'
+            maven 'maven-3.6.0'
         }
         agent none
         stages {
