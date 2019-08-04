@@ -88,6 +88,7 @@ def call(body) {
 
                     // Setter environment.properties
                     sh(script: "rm -f target/allure-results/environment.properties")
+                    sh(script: "mkdir -p target/allure-results")
                     sh(script: "echo sut.version=$params.applikasjonVersjon >> target/allure-results/environment.properties")
                     sh(script: "echo vtp.version=$vtpVersjon >> target/allure-results/environment.properties")
                     sh(script: "echo autotest.version=$autotestVersjon >> target/allure-results/environment.properties")
