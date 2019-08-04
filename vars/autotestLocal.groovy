@@ -71,7 +71,7 @@ def call(body) {
                 String sutToRun = applikasjonVersjon
                 String dockerRegistry = "repo.adeo.no:5443"
                 def vtpVersjon = "latest"
-
+                def autotestVersjon = "latest"
 
                 stage("Init") {
                     console.printStage("Init")
@@ -83,8 +83,14 @@ def call(body) {
                     checkout scm
 
                     vtpVersjon = sh(script: "git ls-remote --tags git@vtp.github.com:navikt/vtp.git | sort -t '/' -k 3 -V | tail -2 | head -1 | grep -o '[^\\/]*\$'", returnStdout: true)?.trim();
-
+                    autotestVersjon = sh(script: "git rev-parse HEAD", returnStdout: true)?.trim();
                     println "Using VTP version '${vtpVersjon}'"
+
+                    // Setter environment.properties
+                    sh(script: "rm -f target/allure-results/environment.properties")
+                    sh(script: "echo sut.version=$params.applikasjonVersjon >> target/allure-results/environment.properties")
+                    sh(script: "echo vtp.version=$vtpVersjon >> target/allure-results/environment.properties")
+                    sh(script: "echo autotest.version=$autotestVersjon >> target/allure-results/environment.properties")
 
                     def workspace = pwd()
                     def dsfile = workspace + "/resources/pipeline/" + applikasjon + "_datasource.list"
@@ -94,7 +100,6 @@ def call(body) {
                         currentBuild.result('FAILED')
                     }
                 }
-
 
                 stage("Cleanup docker ps og images") {
                     sh 'docker stop $(docker ps -a -q) || true'
@@ -127,8 +132,7 @@ def call(body) {
                     }
                 }
 
-
-                stage("Setup keystores"){
+                stage("Setup keystores") {
                     keystores.generateKeystoreAndTruststore("fpmock2")
                 }
 
@@ -140,7 +144,7 @@ def call(body) {
                     sh(script: "echo NO_NAV_MODIG_SECURITY_APPCERT_KEYSTORE=/root/.modig/keystore.jks >> vtp.env")
                     sh(script: "echo ISSO_OAUTH2_ISSUER=https://fpmock2:8063/rest/isso/oauth2 >> vtp.env")
                     sh(script: "echo VTP_KAFKA_HOST=localhost:9093 >> vtp.env")
-                    
+
                     sh "docker run -d --name fpmock2 --env-file vtp.env -v $workspace/.modig:/root/.modig -p 8636:8636 -p 8063:8063 -p 8060:8060 -p 8001:8001 -p 9093:9093  ${dockerRegistry}/fpmock2:${vtpVersjon}"
                 }
 
@@ -153,7 +157,7 @@ def call(body) {
                     def host_ip = InetAddress.localHost.hostAddress
                     println host_ip
 
-                    sh "docker run -d --name $applikasjon --add-host=host.docker.internal:${host_ip} -v $workspace/.modig:/var/run/secrets/naisd.io/ --env-file sut.env  --env-file $workspace/resources/pipeline/autotest.list --env-file $workspace/resources/pipeline/" + params.applikasjon + "_datasource.list -p 8080:8080 -p 8000:8000 --link fpmock2:fpmock2 "+dockerRegistry+"/$applikasjon:$sutToRun"
+                    sh "docker run -d --name $applikasjon --add-host=host.docker.internal:${host_ip} -v $workspace/.modig:/var/run/secrets/naisd.io/ --env-file sut.env  --env-file $workspace/resources/pipeline/autotest.list --env-file $workspace/resources/pipeline/" + params.applikasjon + "_datasource.list -p 8080:8080 -p 8000:8000 --link fpmock2:fpmock2 " + dockerRegistry + "/$applikasjon:$sutToRun"
                 }
 
                 stage("Verifiserer VTP") {
