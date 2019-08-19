@@ -66,7 +66,7 @@ def call() {
                             echo("envs: " + envs)
                             echo("artifact: " + ARTIFACTID)
 
-                            mavenCommand = "mvn -B -Dfile.encoding=UTF-8 -DinstallAtEnd=true -DdeployAtEnd=true -Dsha1= -Dchangelist= -Drevision=$version -Djava.security.egd=file:///dev/urandom clean install"
+                            mavenCommand = "mvn -B -Dfile.encoding=UTF-8 -DinstallAtEnd=true -DdeployAtEnd=true -Dsha1= -Dchangelist= -Drevision=$version -Djava.security.egd=file:///dev/urandom -DtrimStackTrace=false" clean install"
                             if (ARTIFACTID.equalsIgnoreCase("fpmock2")) {
                                 echo("MVN deploy for fpmock2")
                                 mavenCommand = mavenCommand + " deploy"
