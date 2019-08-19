@@ -152,7 +152,7 @@ def call() {
                 }
                 steps {
                     script {
-                        build job: 'autotest-dispatcher', parameters: [
+                        build job: 'Foreldrepenger/autotest-dispatcher', parameters: [
                                 [$class: 'StringParameterValue', name:  'application', value: "${ARTIFACTID}"],
                                 [$class: 'StringParameterValue', name:  'version', value: "${version}"],
                                 [$class: 'StringParameterValue', name:  'changelog', value: "${currentBuild.changeSets}"]
