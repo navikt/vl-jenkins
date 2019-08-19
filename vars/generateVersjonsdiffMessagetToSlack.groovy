@@ -40,7 +40,7 @@ def call() {
                       def gitRepoApps = ["fpsak-frontend":'fpsak-frontend', fpformidling:'fp-formidling', fpoppdrag:'fpoppdrag', fptilbake:'fptilbake', fplos:'fplos', fpabakus:'fp-abakus']
                       def stashRepoApps = [fpsak:'vl-foreldrepenger', fpfordel:'vl-fordel', fpabonnent:'vl-fpabonnent']
 
-                      def keys = params.keySet() as List
+                      def keys = params.keySet().sort() as List
                       for ( int i = 0; i < keys.size(); i++ ) {
                           app = keys[i]
 
