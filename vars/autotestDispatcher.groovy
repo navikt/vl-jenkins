@@ -35,6 +35,9 @@ def call(body) {
                 println("Parametere:")
                 println(params.toString())
 
+                println("Changelog:")
+                println(changelog)
+
 
                 stage("Starter test for applikasjon") {
                     println("Starter applikasjon: ${application} med versjon: ${version} ")
