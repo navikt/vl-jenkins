@@ -152,10 +152,11 @@ def call() {
                 }
                 steps {
                     script {
+                        def changes = buildEnvironment.makeCommitLogString(currentBuild.rawBuild.changeSets)
                         build job: 'Foreldrepenger/autotest-dispatcher', parameters: [
                                 [$class: 'StringParameterValue', name:  'application', value: "${ARTIFACTID}"],
                                 [$class: 'StringParameterValue', name:  'version', value: "${version}"],
-                                [$class: 'StringParameterValue', name:  'changelog', value: "${currentBuild.changeSets}"]
+                                [$class: 'StringParameterValue', name:  'changelog', value: "${changes}"]
                         ], wait: false
                     }
                 }

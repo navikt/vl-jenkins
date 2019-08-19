@@ -22,3 +22,17 @@ def overrideJDK(String targetJDK) {
             break
     }
 }
+
+def makeCommitLogString(def changeSet){
+
+    StringBuilder sb = new StringBuilder()
+    changeSet.each {
+        def entries = it.items
+        println("Entries: " + entries.toString())
+        entries.each {
+            def entry = it
+            sb.append("- ${entry.commitId.substring(0,12)} av ${entry.author}: \"${entry.msg}\"\n")
+        }
+    }
+    return sb.toString()
+}
