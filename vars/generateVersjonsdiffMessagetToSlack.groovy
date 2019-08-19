@@ -47,19 +47,19 @@ def call() {
                           if(params.get(app)) {
                               preprodVersion = getAppVersion("preprod-fss", fraNs, app)
                               prodVersion = getAppVersion("prod-fss", tilNs, app)
+                              message += "\n $app "
+                              if (preprodVersion == prodVersion) {
+                                  message += " [=]\n"
+                              } else {
+                                  message += " [>]\n"
+                              }
+                              if (gitRepoApps.containsKey(app)) {
+                                  message += githubBaseURL + "/${gitRepoApps.get(app)}/compare/${prodVersion}...${preprodVersion}"
+                              } else {
+                                message += slackBaseURL + "/${stashRepoApps.get(app)}/compare/commits?targetBranch=refs%2Ftags%2F${prodVersion}&sourceBranch=refs%2Ftags%2F${preprodVersion}"
+                              }
+                              message += "\n"
                           }
-                          message += "\n $app "
-                          if (preprodVersion == prodVersion) {
-                              message += " [=]\n"
-                          } else {
-                              message += " [>]\n"
-                          }
-                          if (gitRepoApps.containsKey(app)) {
-                              message += githubBaseURL + "/${gitRepoApps.get(app)}/compare/${prodVersion}...${preprodVersion}"
-                          } else {
-                            message += slackBaseURL + "/${stashRepoApps.get(app)}/compare/commits?targetBranch=refs%2Ftags%2F${prodVersion}&sourceBranch=refs%2Ftags%2F${preprodVersion}"
-                          }
-                          message += "\n"
                       }
 
                       slackMessage(message, msgColor)
