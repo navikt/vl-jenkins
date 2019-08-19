@@ -101,5 +101,5 @@ def getAppVersion(context, ns, appl) {
 }
 
 def slackMessage(message, msgColor) {
-  slackSend(color: "$msgColor", channel: "#fp-ci-test", message: "$message")
+  slackSend(color: "$msgColor", channel: "#fp-go-no-go", message: "$message")
 }
