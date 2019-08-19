@@ -66,7 +66,7 @@ def call() {
                             echo("envs: " + envs)
                             echo("artifact: " + ARTIFACTID)
 
-                            mavenCommand = "mvn -B -Dfile.encoding=UTF-8 -DinstallAtEnd=true -DdeployAtEnd=true -Dsha1= -Dchangelist= -Drevision=$version -Djava.security.egd=file:///dev/urandom -DtrimStackTrace=false" clean install"
+                            mavenCommand = "mvn -B -Dfile.encoding=UTF-8 -DinstallAtEnd=true -DdeployAtEnd=true -Dsha1= -Dchangelist= -Drevision=$version -Djava.security.egd=file:///dev/urandom -DtrimStackTrace=false clean install"
                             if (ARTIFACTID.equalsIgnoreCase("fpmock2")) {
                                 echo("MVN deploy for fpmock2")
                                 mavenCommand = mavenCommand + " deploy"
@@ -152,7 +152,7 @@ def call() {
                 }
                 steps {
                     script {
-                        buildEnvironment = new buildEnvironment()
+                        def buildEnvironment = new buildEnvironment()
                         def changes = buildEnvironment.makeCommitLogString(currentBuild.rawBuild.changeSets)
                         build job: 'Foreldrepenger/autotest-dispatcher', parameters: [
                                 [$class: 'StringParameterValue', name:  'application', value: "${ARTIFACTID}"],
