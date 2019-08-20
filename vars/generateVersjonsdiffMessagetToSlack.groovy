@@ -92,7 +92,7 @@ def call() {
 
 def getAppVersion(context, ns, appl) {
     def version
-
+    def dockerRegistryIapp = "repo.adeo.no:5443"
     sh "k config use-context $context"
 
     def contImages = sh(
