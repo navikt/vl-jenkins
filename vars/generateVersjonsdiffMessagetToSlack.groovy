@@ -95,24 +95,23 @@ def getAppVersion(context, ns, appl) {
 
     sh "k config use-context $context"
 
-    def versions = sh(
-       script: "k get pods -l app=${appl} -n${ns} -o jsonpath='{.items[*].spec.containers[*].env[?(@.name==\"APP_VERSION\")].value}'|tr -d '%'",
+    def contImages = sh(
+       script: "k get pods -l app=${appl} -n${ns} -o jsonpath='{.items[*].spec.containers[*].image}'|tr -d '%'",
        returnStdout: true
-    ).trim().split()
+    ).trim()
+    versions = contImages.replaceAll("$dockerRegistryIapp/$appl:", "").split()
 
     if (versions) {
       versions = versions.toUnique()
       echo "versions: $ns $appl $versions"
 
       if (versions.size() > 1) {
-        message = "Endringer til P: $appl har feilende poder i $ns, sjekk!! "
-        slackMessage(message, msgColor)
+        slackMessage("Endringer til P: $appl har feilende poder i $ns, sjekk!! ", msgColor)
       } else if (versions.size() == 1) {
         version = versions.first()
       }
     } else {
-      message = "Endringer til P: $appl har ingen kjørende poder i $ns."
-      slackMessage(message, msgColor)
+      slackMessage("Endringer til P: $appl har ingen kjørende poder i $ns.", msgColor)
     }
 
     return version
