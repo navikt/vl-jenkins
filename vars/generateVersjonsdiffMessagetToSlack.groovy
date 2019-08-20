@@ -106,12 +106,12 @@ def getAppVersion(context, ns, appl) {
       echo "versions: $ns $appl $versions"
 
       if (versions.size() > 1) {
-        slackMessage("Endringer til P: $appl har feilende poder i $ns, sjekk!! ", msgColor)
+        slackMessage("Endringer til P: $appl har feilende poder i $context $ns, sjekk!! ", msgColor)
       } else if (versions.size() == 1) {
         version = versions.first()
       }
     } else {
-      slackMessage("Endringer til P: $appl har ingen kjørende poder i $ns.", msgColor)
+      slackMessage("Endringer til P: $appl har ingen kjørende poder i $context $ns.", msgColor)
     }
 
     return version
