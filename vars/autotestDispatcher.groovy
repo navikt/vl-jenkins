@@ -25,7 +25,7 @@ def call(body) {
                 [$class: 'BooleanParameterValue', name: 'clean', value: clean]
         ]
 
-        supportedApps = ["fpsak","spberegning"]
+        supportedApps = ["fpsak","spberegning","fptilbake"]
 
 
         node('VTPAUTOTEST') {
