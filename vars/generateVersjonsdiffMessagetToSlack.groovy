@@ -92,13 +92,15 @@ def call() {
 def getAppVersion(context, ns, appl) {
     def version
     def dockerRegistryIapp = "repo.adeo.no:5443"
+    def dockerRegistryNav = "navikt"
+    
     sh "k config use-context $context"
 
     def contImages = sh(
        script: "k get pods -l app=${appl} -n${ns} -o jsonpath='{.items[*].spec.containers[*].image}'|tr -d '%'",
        returnStdout: true
     ).trim()
-    versions = contImages.replaceAll("$dockerRegistryIapp/$appl:", "").split()
+    versions = contImages.replaceAll("$dockerRegistryIapp/$appl:", "").replaceAll("$dockerRegistryNav/$appl:", "").split()
 
     if (versions) {
       versions = versions.toUnique()
