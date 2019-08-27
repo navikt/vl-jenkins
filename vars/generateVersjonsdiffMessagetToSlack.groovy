@@ -13,11 +13,11 @@ def call() {
         }
 
         parameters {
-            booleanParam(defaultValue: true, description: '', name: 'fpsak', )
-            booleanParam(defaultValue: true, description: '', name: 'fpfordel')
+            booleanParam(defaultValue: true, description: '', name: 'fpsak')
             booleanParam(defaultValue: true, description: '', name: 'fpinfo')
             booleanParam(defaultValue: true, description: '', name: 'spberegning')
 
+            booleanParam(defaultValue: true, description: '', name: 'fpfordel')
             booleanParam(defaultValue: true, description: '', name: 'fplos')
             booleanParam(defaultValue: true, description: '', name: 'fpoppdrag')
             booleanParam(defaultValue: true, description: '', name: 'fptilbake')
@@ -47,10 +47,10 @@ def call() {
                                           fptilbake:'fptilbake',
                                           fplos:'fplos',
                                           fpabakus:'fp-abakus',
-                                          fpabonnent:'fpabonnent']
+                                          fpabonnent:'fpabonnent',
+                                          fpfordel: 'fpfordel']
 
                       def stashRepoApps = [fpsak:'vl-foreldrepenger',
-                                            fpfordel:'vl-fordel',
                                             fpinfo:'vl-fpinfo',
                                             spberegning:'vl-beregning']
 
