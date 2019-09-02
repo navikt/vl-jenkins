@@ -5,6 +5,7 @@ def call() {
     def fpgithub = new fpgithub()
     def version
     def githubRepoName
+    def uploadToNais = ['fpsak', 'fpfordel', 'spberegning', 'fplos', 'fpabonnent', 'fpinfo']
     def GIT_COMMIT_HASH_FULL
 
     pipeline {
@@ -79,6 +80,10 @@ def call() {
                                               usernameVariable: 'NEXUS_USERNAME',
                                               passwordVariable: 'NEXUS_PASSWORD']]) {
                                 sh "docker login -u ${env.NEXUS_USERNAME} -p ${env.NEXUS_PASSWORD} ${dockerRegistryIapp} && docker push ${dockerRegistryIapp}/${ARTIFACTID}:${version}"
+                                
+                                if (uploadToNais.contains(ARTIFACTID.toLowerCase())) {
+                                    sh "nais upload -u ${env.NEXUS_USERNAME} -p ${env.NEXUS_PASSWORD} -a ${ARTIFACTID} -v ${version}"
+                                }
                             }
                         }
                     }
@@ -146,7 +151,6 @@ def call() {
                             echo "Jira deploy"
                             jira = new jira()
                             jira.deployNais(ARTIFACTID, version, MILJO)
-                            
                         }
                     }
                 }
