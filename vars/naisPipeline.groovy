@@ -141,7 +141,12 @@ def call() {
                                             ignoreSslErrors       : true
                                     ])
                                 }
-                            }
+                            }                        
+                        } else {
+                            echo "Jira deploy"
+                            jira = new jira()
+                            jira.deployNais(ARTIFACTID, version, MILJO)
+                            
                         }
                     }
                 }
