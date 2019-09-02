@@ -67,7 +67,7 @@ def naisDeployPayload(String callbackUrl,
 
 def createJiraTask(Object payload) {
     withCredentials([[$class: "UsernamePasswordMultiBinding",
-                      credentialsId: 'jiraServiceUser',
+                      credentialsId: 'jirauser',
                       usernameVariable: "JIRA_USERNAME",
                       passwordVariable: "JIRA_PASSWORD"]]) {
 
