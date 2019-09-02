@@ -101,7 +101,7 @@ def environmentId(String environmentName) {
 }
 
 def slackError(String tilleggsinfo) {
-    slackSend color: "danger", channel: "#fp-ci-test",  message: "${env.JOB_NAME} [${env.BUILD_NUMBER}] feilet: ${env.BUILD_URL} ${tilleggsinfo}"
+    slackSend color: "danger", channel: "#foreldrepenger-ci",  message: "${env.JOB_NAME} [${env.BUILD_NUMBER}] feilet: ${env.BUILD_URL} ${tilleggsinfo}"
 }
 
 def slackInfo(String msg) {
@@ -109,5 +109,5 @@ def slackInfo(String msg) {
 }
 
 def slackInfo(String color, String msg) {
-    slackSend color: color, channel: "#fp-ci-test", message: msg
+    slackSend color: color, channel: "#foreldrepenger-ci", message: msg
 }
