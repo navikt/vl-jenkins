@@ -36,7 +36,6 @@ def deployNais(String artifactId, String version, String miljo) {
         slackInfo(msgColor, "_Deploy av $artifactId:$version til $miljo var suksessfult._")
 
     } catch (error) {
-        mail.error()
         slackError("Dette gjelder ${artifactId} til: ${miljo}")
         throw error
     }
