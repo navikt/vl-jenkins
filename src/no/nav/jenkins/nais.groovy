@@ -4,7 +4,7 @@ def getAppVersion(context, ns, appl) {
     def version
     def dockerRegistryIapp = "repo.adeo.no:5443"
     def dockerRegistryNav = "navikt"
-    deg msg
+    def msg
     
     sh "k config use-context $context"
 
