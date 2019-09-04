@@ -211,7 +211,7 @@ def deployk8(String artifactId, String from, String to, String scmURL) {
                            userRemoteConfigs: [[credentialsId: '', url: scmURL]]
                ])
 
-        if (fileExists 'k8s') {
+        if (fileExists ('k8s')) {
             dir('k8s') {
                 def props = readProperties interpolate: true, file: "application.${to}.variabler.properties"
                 def value = "s/RELEASE_VERSION/${version}/g"
