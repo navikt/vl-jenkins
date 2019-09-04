@@ -22,7 +22,7 @@ def call(body) {
     body.delegate = config
     body()
 
-    def selftestUrls = [fpsak: "/fpsak/internal/health/selftest", spberegning: "/spberegning/internal/selftest"]
+    def selftestUrls = [fpsak: "/fpsak/internal/health/selftest", spberegning: "/spberegning/internal/selftest", fprisk: "/fprisk/internal/selftest"]
 
 
     timestamps {
