@@ -283,7 +283,7 @@ def call(body) {
                 }
             } catch (Exception e) {
                 println("Bygg feilet: $e")
-                slackSend(color: "#FF0000", channel: "vtp-autotest-resultat", message: "Noe gikk feil - Autotest feilet uten testkjøring (" + applikasjon + " [" + applikasjonVersjon + "]).:"e.getMessage())
+                slackSend(color: "#FF0000", channel: "vtp-autotest-resultat", message: "Noe gikk feil - Autotest feilet uten testkjøring (" + applikasjon + " [" + applikasjonVersjon + "]) "+ e.getMessage())
                 println(e.getMessage())
                 currentBuild.result = 'FAILURE'
             }
