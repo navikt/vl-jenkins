@@ -154,7 +154,6 @@ def call(body) {
                     sh(script: "echo EXTRA_CLASS_PATH=:vtp-lib/* >> sut.env")
 
                     def workspace = pwd()
-                    //def host_ip = sh(script:"ip route show 0.0.0.0/0 | grep -Eo 'via \\S+' | awk '{ print \$2 }'", returnStdout: true)
                     def host_ip = InetAddress.localHost.hostAddress
                     println host_ip
 
@@ -168,7 +167,6 @@ def call(body) {
                     while (!dockerLokal.sjekkLokalVtpStatus()) {
                         if (vtpRetry > retryLimit) {
                             throw new Exception("Retrylimit oversteget for verifisering av VTP")
-                            break
                         }
                         println("VTP ikke klar, venter $vent sekunder...")
                         println("VTP retry $vtpRetry av $retryLimit")
@@ -185,13 +183,11 @@ def call(body) {
                     while (!dockerLokal.sjekkLokalApplikasjonStatus(selftestUrls.get(applikasjon))) {
                         if (sutRetry > retryLimit) {
                             throw new Exception("Retrylimit oversteget for å starte SUT " + $applikasjon)
-                            break
                         }
                         println("SUT $applikasjon ikke klar, venter $vent sekunder...")
                         println("SUT retry $sutRetry av $retryLimit")
                         sutRetry++
                         sleep(vent)
-
                     }
                 }
 
@@ -287,6 +283,7 @@ def call(body) {
                 }
             } catch (Exception e) {
                 println("Bygg feilet: $e")
+                slackSend(color: "#FF0000", channel: "vtp-autotest-resultat", message: "Noe gikk feil - Autotest feilet uten testkjøring (" + applikasjon + " [" + applikasjonVersjon + "]).:"e.getMessage())
                 println(e.getMessage())
                 currentBuild.result = 'FAILURE'
             }
