@@ -182,7 +182,7 @@ def call(body) {
                     int vent = 5
                     while (!dockerLokal.sjekkLokalApplikasjonStatus(selftestUrls.get(applikasjon))) {
                         if (sutRetry > retryLimit) {
-                            throw new Exception("Retrylimit oversteget for å starte SUT " + $applikasjon)
+                            throw new Exception("Retrylimit oversteget for å starte SUT " + applikasjon)
                         }
                         println("SUT $applikasjon ikke klar, venter $vent sekunder...")
                         println("SUT retry $sutRetry av $retryLimit")
