@@ -120,6 +120,9 @@ def call() {
                         def k8exists = fileExists 'k8s'
                         if (k8exists) {
                             dir('k8s') {
+                                String msgColor = "#077040"
+                                slackInfo("Deploy av *" + ARTIFACTID + "*:" + version + " til *" + MILJO + '*')
+                                
                                 def props = readProperties interpolate: true, file: "application.${MILJO}.variabler.properties"
                                 def value = "s/RELEASE_VERSION/${version}/g"
                                 props.each { k, v -> value = value + ";s%$k%$v%g" }
@@ -146,6 +149,7 @@ def call() {
                                             ignoreSslErrors       : true
                                     ])
                                 }
+                                slackInfo(msgColor, "_Deploy av $ARTIFACTID:$version til $MILJO var suksessfult._")
                             }                        
                         } else {
                             echo "Jira deploy"
@@ -173,4 +177,16 @@ def call() {
             }
         }
     }
+}
+
+def slackError(String tilleggsinfo) {
+    slackSend color: "danger", channel: "#foreldrepenger-ci",  message: "${env.JOB_NAME} [${env.BUILD_NUMBER}] feilet: ${env.BUILD_URL} ${tilleggsinfo}"
+}
+
+def slackInfo(String msg) {
+    slackInfo("#595959", msg)
+}
+
+def slackInfo(String color, String msg) {
+    slackSend color: color, channel: "#foreldrepenger-ci", message: msg
 }
