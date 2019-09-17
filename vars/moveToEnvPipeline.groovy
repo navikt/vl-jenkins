@@ -236,5 +236,5 @@ def deployk8(String artifactId, String from, String to, String scmURL) {
 }
 
 def slackMessage(message, msgColor) {
-  slackSend(color: "$msgColor", channel: "#fp-ci-test", message: "$message")
+  slackSend(color: "$msgColor", channel: "#foreldrepenger-ci", message: "$message")
 }
