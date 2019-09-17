@@ -213,6 +213,7 @@ def deployk8(String artifactId, String from, String to, String scmURL) {
 
         if (fileExists ('k8s')) {
             dir('k8s') {
+                slackInfo("Deploy av *" + artifactId + "*:" + version + " til *" + to + '*', msgColor)
                 def props = readProperties interpolate: true, file: "application.${to}.variabler.properties"
                 def value = "s/RELEASE_VERSION/${version}/g"
                 props.each { k, v -> value = value + ";s%$k%$v%g" }
@@ -223,6 +224,10 @@ def deployk8(String artifactId, String from, String to, String scmURL) {
 
                 def exitCode = sh returnStatus: true, script: "k rollout status -n${naisNamespace} deployment/${artifactId}"
                 echo "exit code is $exitCode"
+                
+                if (exitCode == 0) {
+                    slackInfo("_Deploy av $artifactId:$version til $to var suksessfult._", msgColor) 
+                }
             }                        
         } else {
           error('Deploy av $artifactId feilet! Fant ikke katalogen k8.')
