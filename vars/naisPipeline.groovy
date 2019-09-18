@@ -68,8 +68,8 @@ def call() {
                             echo("artifact: " + ARTIFACTID)
 
                             mavenCommand = "mvn -B -Dfile.encoding=UTF-8 -DinstallAtEnd=true -DdeployAtEnd=true -Dsha1= -Dchangelist= -Drevision=$version -Djava.security.egd=file:///dev/urandom -DtrimStackTrace=false clean install"
-                            if (ARTIFACTID.equalsIgnoreCase("fpmock2")) {
-                                echo("MVN deploy for fpmock2")
+                            if (ARTIFACTID.equalsIgnoreCase("vtp")) {
+                                echo("MVN deploy for vtp")
                                 mavenCommand = mavenCommand + " deploy"
                             }
 
@@ -80,7 +80,7 @@ def call() {
                                               usernameVariable: 'NEXUS_USERNAME',
                                               passwordVariable: 'NEXUS_PASSWORD']]) {
                                 sh "docker login -u ${env.NEXUS_USERNAME} -p ${env.NEXUS_PASSWORD} ${dockerRegistryIapp} && docker push ${dockerRegistryIapp}/${ARTIFACTID}:${version}"
-                                
+
                                 if (uploadToNais.contains(ARTIFACTID.toLowerCase())) {
                                     sh "nais upload -u ${env.NEXUS_USERNAME} -p ${env.NEXUS_PASSWORD} -a ${ARTIFACTID} -v ${version}"
                                 }
@@ -122,7 +122,7 @@ def call() {
                             dir('k8s') {
                                 String msgColor = "#077040"
                                 slackInfo("Deploy av *" + ARTIFACTID + "*:" + version + " til *" + MILJO + '*')
-                                
+
                                 def props = readProperties interpolate: true, file: "application.${MILJO}.variabler.properties"
                                 def value = "s/RELEASE_VERSION/${version}/g"
                                 props.each { k, v -> value = value + ";s%$k%$v%g" }
@@ -150,7 +150,7 @@ def call() {
                                     ])
                                 }
                                 slackInfo(msgColor, "_Deploy av $ARTIFACTID:$version til $MILJO var suksessfult._")
-                            }                        
+                            }
                         } else {
                             echo "Jira deploy"
                             jira = new jira()

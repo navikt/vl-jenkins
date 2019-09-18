@@ -34,7 +34,7 @@ subjectAltName = @alt_names
 keyUsage = keyEncipherment, dataEncipherment
 extendedKeyUsage = serverAuth
 [ alt_names ]
-DNS.1 = fpmock2
+DNS.1 = vtp
 DNS.2 = localhost
 """
 
