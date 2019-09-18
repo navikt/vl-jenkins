@@ -109,7 +109,7 @@ def call(body) {
 
                 stage("Pull") {
                     sh "docker pull $dockerRegistry/$applikasjon:$params.applikasjonVersjon"
-                    sh "docker pull $dockerRegistry/fpmock2:$vtpVersjon"
+                    sh "docker pull $dockerRegistry/vtp:$vtpVersjon"
                 }
 
                 stage("Clean db") {
@@ -143,10 +143,10 @@ def call(body) {
                     sh(script: "echo JAVAX_NET_SSL_TRUSTSTOREPASSWORD=changeit >> vtp.env")
                     sh(script: "echo NO_NAV_MODIG_SECURITY_APPCERT_PASSWORD=devillokeystore1234 >> vtp.env")
                     sh(script: "echo NO_NAV_MODIG_SECURITY_APPCERT_KEYSTORE=/root/.modig/keystore.jks >> vtp.env")
-                    sh(script: "echo ISSO_OAUTH2_ISSUER=https://fpmock2:8063/rest/isso/oauth2 >> vtp.env")
+                    sh(script: "echo ISSO_OAUTH2_ISSUER=https://vtp:8063/rest/isso/oauth2 >> vtp.env")
                     sh(script: "echo VTP_KAFKA_HOST=localhost:9093 >> vtp.env")
 
-                    sh "docker run -d --name fpmock2 --env-file vtp.env -v $workspace/.modig:/root/.modig -p 8636:8636 -p 8063:8063 -p 8060:8060 -p 8001:8001 -p 9093:9093  ${dockerRegistry}/fpmock2:${vtpVersjon}"
+                    sh "docker run -d --name vtp --env-file vtp.env -v $workspace/.modig:/root/.modig -p 8636:8636 -p 8063:8063 -p 8060:8060 -p 8001:8001 -p 9093:9093  ${dockerRegistry}/vtp:${vtpVersjon}"
                 }
 
                 stage("Start SUT") {
@@ -157,7 +157,7 @@ def call(body) {
                     def host_ip = InetAddress.localHost.hostAddress
                     println host_ip
 
-                    sh "docker run -d --name $applikasjon --add-host=host.docker.internal:${host_ip} -v $workspace/.modig:/var/run/secrets/naisd.io/ --env-file sut.env  --env-file $workspace/resources/pipeline/autotest.list --env-file $workspace/resources/pipeline/" + params.applikasjon + "_datasource.list -p 8080:8080 -p 8000:8000 --link fpmock2:fpmock2 " + dockerRegistry + "/$applikasjon:$sutToRun"
+                    sh "docker run -d --name $applikasjon --add-host=host.docker.internal:${host_ip} -v $workspace/.modig:/var/run/secrets/naisd.io/ --env-file sut.env  --env-file $workspace/resources/pipeline/autotest.list --env-file $workspace/resources/pipeline/" + params.applikasjon + "_datasource.list -p 8080:8080 -p 8000:8000 --link vtp:vtp " + dockerRegistry + "/$applikasjon:$sutToRun"
                 }
 
                 stage("Verifiserer VTP") {
@@ -231,9 +231,9 @@ def call(body) {
                 stage("Save logs") {
                     //TODO: Må endres når vi skal kjøre i parallell
                     sh "docker logs $applikasjon > sut_log.txt"
-                    sh "docker logs fpmock2 > fpmock2_log.txt"
+                    sh "docker logs vtp > vtp_log.txt"
                     archiveArtifacts "sut_log.txt"
-                    archiveArtifacts "fpmock2_log.txt"
+                    archiveArtifacts "vtp_log.txt"
 
                 }
 
