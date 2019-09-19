@@ -56,6 +56,7 @@ def call() {
             stage('Build') {
                 steps {
                     script {
+                        def additionalMavenArgs = ""
                         withMaven(mavenSettingsConfig: 'navMavenSettings') {
                             buildEnvironment = new buildEnvironment()
                             buildEnvironment.setEnv()
@@ -73,6 +74,23 @@ def call() {
                                 mavenCommand = mavenCommand + " deploy"
                             }
 
+                            if (ARTIFACTID == 'fpsak') {
+                              String branchNavn = org.apache.commons.lang.RandomStringUtils.random(5, true, true)
+                              String schemaNavnFPSAK = "fpsak_unit_" + branchNavn
+                              String schemaNavnFPSAK_HIST = "fpsak_hist_unit_" + branchNavn
+                              mavenCommand +=  " -Dflyway.placeholders.vl_fpsak_hist_schema_unit=$schemaNavnFPSAK_HIST -Dflyway.placeholders.vl_fpsak_hist_schema_unit=$schemaNavnFPSAK_HIST "
+                            }
+                            if (ARTIFACTID.equalsIgnoreCase("fpmock2")) {
+                                echo("MVN deploy for fpmock2")
+                                mavenCommand += " deploy"
+                            }
+                            if (ARTIFACTID == 'fpinfo') {
+                                String rnd = org.apache.commons.lang.RandomStringUtils.random(5, true, true)
+                                additionalMavenArgs = " -Dflyway.placeholders.fpinfo.fpsak.schema.navn=fpsak_$rnd -Dflyway.placeholders.fpinfoschema.schema.navn=fpinfoschema_$rnd -Dflyway.placeholders.fpinfo.schema.navn=fpinfo_$rnd "
+                                mavenCommand += additionalMavenArgs
+                                sh "mvn versions:use-latest-releases -Dincludes=no.nav.foreldrepenger:migreringer -DprocessDependencies=false"
+                            }
+
                             sh "${mavenCommand}"
                             sh "docker build --pull -t $dockerRegistryIapp/$ARTIFACTID:$version ."
                             withCredentials([[$class          : 'UsernamePasswordMultiBinding',
@@ -84,6 +102,11 @@ def call() {
                                 if (uploadToNais.contains(ARTIFACTID.toLowerCase())) {
                                     sh "nais upload -u ${env.NEXUS_USERNAME} -p ${env.NEXUS_PASSWORD} -a ${ARTIFACTID} -v ${version}"
                                 }
+
+                                if (ARTIFACTID == 'fpsak') {
+                                    echo "-------------Deploy migreringene og regellmodell til Nexus -------------"
+                                    sh "mvn -B -Drevision=$version -pl migreringer,:beregningsgrunnlag-regelmodell -DskipITs -DskipUTs -Dmaven.test.skip deploy -DdeployOnly"
+                                }
                             }
                         }
                     }
@@ -91,12 +114,16 @@ def call() {
                 post {
                     success {
                         script {
-                            fpgithub.updateBuildStatus(githubRepoName, "success", GIT_COMMIT_HASH_FULL)
+                            if (ARTIFACTID != 'fpinfo' && ARTIFACTID != 'fpsak') {
+                                fpgithub.updateBuildStatus(githubRepoName, "success", GIT_COMMIT_HASH_FULL)
+                            }
                         }
                     }
                     failure {
                         script {
-                            fpgithub.updateBuildStatus(githubRepoName, "failure", GIT_COMMIT_HASH_FULL)
+                            if (ARTIFACTID != 'fpinfo' && ARTIFACTID != 'fpsak') {
+                                fpgithub.updateBuildStatus(githubRepoName, "failure", GIT_COMMIT_HASH_FULL)
+                            }
                         }
                     }
                 }
@@ -107,8 +134,16 @@ def call() {
                     branch 'master'
                 }
                 steps {
-                    sh "git tag $version -m $version"
-                    sh "git push origin --tag"
+                    script {
+                        sh "git tag $version -m $version"
+                        if (ARTIFACTID == 'fpsak' || ARTIFACTID == 'fpinfo') {
+                            sshagent(['deployer']) {
+                                sh "git push --tags"
+                            }
+                        } else {
+                            sh "git push origin --tag"
+                        }
+                    }
                 }
             }
             stage('Deploy') {
