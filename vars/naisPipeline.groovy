@@ -5,7 +5,7 @@ def call() {
     def fpgithub = new fpgithub()
     def version
     def githubRepoName
-    def uploadToNais = ['fpsak', 'fpfordel', 'fplos', 'fpabonnent', 'fpinfo', 'fpoppdrag', 'fptilbake', 'fprisk']
+    def uploadToNais = ['fpsak', 'fpfordel', 'fplos', 'fpabonnent', 'fpinfo', 'fpoppdrag', 'fptilbake', 'fprisk', 'vtp']
     def GIT_COMMIT_HASH_FULL
 
     pipeline {
