@@ -5,7 +5,7 @@ def call() {
     def fpgithub = new fpgithub()
     def version
     def githubRepoName
-    def uploadToNais = ['fpsak', 'fpfordel', 'fplos', 'fpabonnent', 'fpinfo', 'fpoppdrag', 'fptilbake', 'fprisk', 'vtp']
+    def uploadToNais = ['fpsak', 'fpfordel', 'fplos', 'fpabonnent', 'fpinfo', 'fpoppdrag', 'fptilbake', 'fprisk']
     def GIT_COMMIT_HASH_FULL
 
     pipeline {
@@ -186,6 +186,8 @@ def call() {
                                 }
                                 slackInfo(msgColor, "_Deploy av $ARTIFACTID:$version til $MILJO var suksessfult._")
                             }
+                        } else if (ARTIFACTID == 'vtp'){
+                            echo "$ARTIFACTID deployes ikke til miljøene" 
                         } else {
                             echo "Jira deploy"
                             jira = new jira()
