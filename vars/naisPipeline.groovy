@@ -189,6 +189,9 @@ def call() {
                         } else if (ARTIFACTID == 'vtp'){
                             echo "$ARTIFACTID deployes ikke til miljøene" 
                         } else {
+                            if (ARTIFACTID == 'fpinfo' && MILJO == "t4") {
+                                MILJO = "q1"
+                            }
                             echo "Jira deploy"
                             jira = new jira()
                             jira.deployNais(ARTIFACTID, version, MILJO)
