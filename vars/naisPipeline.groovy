@@ -7,13 +7,12 @@ def call() {
     def githubRepoName
     def uploadToNais = ['fpsak', 'fpfordel', 'fplos', 'fpabonnent', 'fpinfo', 'fpoppdrag', 'fptilbake', 'fprisk']
     def GIT_COMMIT_HASH_FULL
-    def defaultMiljo = (readMavenPom().getArtifactId() == "fpinfo" ) ? "q1" : "t4"
-
+    
     pipeline {
         //agent any
         agent { label 'MASTER' }
         parameters {
-            string(defaultValue: "${defaultMiljo}", description: '', name: 'miljo')
+            string(defaultValue: 't4', description: '', name: 'miljo')
         }
         options {
             timestamps()
@@ -191,11 +190,9 @@ def call() {
                         } else if (ARTIFACTID == 'vtp'){
                             echo "$ARTIFACTID deployes ikke til miljøene" 
                         } else {
-                            /*
                             if (ARTIFACTID == 'fpinfo' && MILJO == "t4") {
                                 MILJO = "q1"
                             }
-                            */
                             echo "Jira deploy"
                             jira = new jira()
                             jira.deployNais(ARTIFACTID, version, MILJO)
