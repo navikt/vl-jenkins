@@ -40,7 +40,6 @@ def call() {
                         currentBuild.displayName = version
 
                         echo "Building $version"
-                        echo "defaultMiljo $defaultMiljo"
 
                         fpgithub.updateBuildStatus(githubRepoName, "pending", GIT_COMMIT_HASH_FULL)
 
