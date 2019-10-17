@@ -155,7 +155,9 @@ def call(body) {
 
                     def workspace = pwd()
                     def host_ip = InetAddress.localHost.hostAddress
-                    println host_ip
+                    println "Resultat InetAddress.localHost.hostAddress :" + host_ip
+                    println "Nytt forslag"
+                    println "ifconfig".execute().text
 
                     sh "docker run -d --name $applikasjon --add-host=host.docker.internal:${host_ip} -v $workspace/.modig:/var/run/secrets/naisd.io/ --env-file sut.env  --env-file $workspace/resources/pipeline/autotest.list --env-file $workspace/resources/pipeline/" + params.applikasjon + "_datasource.list -p 8080:8080 -p 8000:8000 --link vtp:vtp " + dockerRegistry + "/$applikasjon:$sutToRun"
                 }
