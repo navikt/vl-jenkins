@@ -40,8 +40,8 @@ def call () {
             stage ('Init') {
               steps {
                   script {
-                      fromNs = params.get("FROM_ENVIRONMENT").trim()
-                      toNs = params.get("TO_ENVIRONMENT").trim()
+                      fromNs = params.get("FROM_ENVIRONMENT").trim().toLowerCase()
+                      toNs = params.get("TO_ENVIRONMENT").trim().toLowerCase()
 
                       if (fromNs.length()*toNs.length() == 0) {
                           echo "FROM_ENVIRONMENT og TO_ENVIRONMENT må ha verdi!"
