@@ -154,12 +154,10 @@ def call(body) {
                     sh(script: "echo EXTRA_CLASS_PATH=:vtp-lib/* >> sut.env")
 
                     def workspace = pwd()
-                    def host_ip = InetAddress.localHost.hostAddress
-                    println "Resultat InetAddress.localHost.hostAddress :" + host_ip
-                    println "Nytt forslag"
-                    println "ifconfig".execute().text
+                    def host_name = "a01apvl00312.adeo.no"
+                    println "Host :" + host_name
 
-                    sh "docker run -d --name $applikasjon --add-host=host.docker.internal:${host_ip} -v $workspace/.modig:/var/run/secrets/naisd.io/ --env-file sut.env  --env-file $workspace/resources/pipeline/autotest.list --env-file $workspace/resources/pipeline/" + params.applikasjon + "_datasource.list -p 8080:8080 -p 8000:8000 --link vtp:vtp " + dockerRegistry + "/$applikasjon:$sutToRun"
+                    sh "docker run -d --name $applikasjon --add-host=host.docker.internal:${host_name} -v $workspace/.modig:/var/run/secrets/naisd.io/ --env-file sut.env  --env-file $workspace/resources/pipeline/autotest.list --env-file $workspace/resources/pipeline/" + params.applikasjon + "_datasource.list -p 8080:8080 -p 8000:8000 --link vtp:vtp " + dockerRegistry + "/$applikasjon:$sutToRun"
                 }
 
                 stage("Verifiserer VTP") {
