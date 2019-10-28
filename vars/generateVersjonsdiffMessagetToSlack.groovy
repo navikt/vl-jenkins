@@ -62,9 +62,9 @@ def call() {
 
                               if (preprodVersion && prodVersion) {
                                   if (preprodVersion == prodVersion) {
-                                      message += "\n $app  [=]\n"
+                                      message += "\n $app  [=]\n  ($prodVersion)"
                                   } else {
-                                      message += "\n $app  [>]\n"
+                                      message += "\n $app  [>]\n  ($prodVersion)"
                                   }
                                   if (gitRepoApps.containsKey(app)) {
                                       message += githubBaseURL + "/${gitRepoApps.get(app)}/compare/${prodVersion}...${preprodVersion}"
