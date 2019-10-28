@@ -105,7 +105,7 @@ def call() {
 
                                 if (ARTIFACTID == 'fpsak') {
                                     echo "-------------Deploy migreringene og regellmodell til Nexus -------------"
-                                    sh "mvn -B -DinstallAtEnd=true -DdeployAtEnd=true -Dsha1= -Dchangelist= -Drevision=$version -pl migreringer,:beregningsgrunnlag-regelmodell -DskipITs -DskipUTs -Dmaven.test.skip deploy -DdeployOnly"
+                                    sh "mvn -B -DinstallAtEnd=true -DdeployAtEnd=true -Dsha1= -Dchangelist= -Drevision=$version -pl migreringer,:folketrygdloven-beregningsgrunnlag-regelmodell -DskipITs -DskipUTs -Dmaven.test.skip deploy -DdeployOnly"
                                 }
                             }
                         }
