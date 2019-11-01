@@ -7,7 +7,7 @@ def call() {
     def githubRepoName
     def uploadToNais = ['fpsak', 'fpfordel', 'fplos', 'fpabonnent', 'fpinfo', 'fpoppdrag', 'fptilbake', 'fprisk']
     def GIT_COMMIT_HASH_FULL
-    
+
     pipeline {
         //agent any
         agent { label 'MASTER' }
@@ -146,6 +146,22 @@ def call() {
                     }
                 }
             }
+            stage('Start autotest dispatcher') {
+                when {
+                    branch 'master'
+                }
+                steps {
+                    script {
+                        def buildEnvironment = new buildEnvironment()
+                        def changes = buildEnvironment.makeCommitLogString(currentBuild.rawBuild.changeSets)
+                        build job: 'Foreldrepenger/autotest-dispatcher', parameters: [
+                                [$class: 'StringParameterValue', name:  'application', value: "${ARTIFACTID}"],
+                                [$class: 'StringParameterValue', name:  'version', value: "${version}"],
+                                [$class: 'StringParameterValue', name:  'changelog', value: "${changes}"]
+                        ], wait: false
+                    }
+                }
+            }
             stage('Deploy') {
                 when {
                     branch 'master'
@@ -187,7 +203,7 @@ def call() {
                                 slackInfo(msgColor, "_Deploy av $ARTIFACTID:$version til $MILJO var suksessfult._")
                             }
                         } else if (ARTIFACTID == 'vtp'){
-                            echo "$ARTIFACTID deployes ikke til miljøene" 
+                            echo "$ARTIFACTID deployes ikke til miljøene"
                         } else {
                             if (ARTIFACTID == 'fpinfo' && MILJO == "t4") {
                                 MILJO = "q1"
@@ -196,22 +212,6 @@ def call() {
                             jira = new jira()
                             jira.deployNais(ARTIFACTID, version, MILJO)
                         }
-                    }
-                }
-            }
-            stage('Start autotest dispatcher') {
-                when {
-                    branch 'master'
-                }
-                steps {
-                    script {
-                        def buildEnvironment = new buildEnvironment()
-                        def changes = buildEnvironment.makeCommitLogString(currentBuild.rawBuild.changeSets)
-                        build job: 'Foreldrepenger/autotest-dispatcher', parameters: [
-                                [$class: 'StringParameterValue', name:  'application', value: "${ARTIFACTID}"],
-                                [$class: 'StringParameterValue', name:  'version', value: "${version}"],
-                                [$class: 'StringParameterValue', name:  'changelog', value: "${changes}"]
-                        ], wait: false
                     }
                 }
             }
