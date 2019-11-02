@@ -41,6 +41,7 @@ def call(body) {
         def console = new console()
         def dockerLokal = new dockerLocal()
         def keystores = new keystores()
+        def nais = new nais()
 
         //Deaktivert p.g.a ex-base
         def mvnTestProperties = ["junit.jupiter.execution.parallel.enabled"                 : "true",
@@ -83,6 +84,9 @@ def call(body) {
                     checkout scm
 
                     vtpVersjon = sh(script: "git ls-remote --tags git@vtp.github.com:navikt/vtp.git | sort -t '/' -k 3 -V | tail -2 | head -1 | grep -o '[^\\/]*\$'", returnStdout: true)?.trim();
+
+
+
                     autotestVersjon = sh(script: "git rev-parse HEAD", returnStdout: true)?.trim();
                     println "Using VTP version '${vtpVersjon}'"
 
@@ -112,41 +116,19 @@ def call(body) {
                     sh "docker pull $dockerRegistry/vtp:$vtpVersjon"
                 }
 
-                stage("Clean db") {
-                    if (params.clean) {
-                        println("Her skal det ryddes.. Når klart")
-                        //sh "$workspace/resources/pipeline/" + params.applikasjon + "_datasource.list"
-                        String path = "${workspace}/resources/pipeline/${params.applikasjon}_datasource.list"
-                        println(path)
-                        //TODO: Split til Hashmap med kodeverdier for brukernavn, DB_URL og passord for database. Lag input til flyway clean.
-                        String dbConfig = readFile(path)
-                        def configMap = dbConfig.split("\n").collectEntries { entry ->
-                            def pair = entry.split("=")
-                            [(pair.first()): pair.last()]
-                        }
-
-                        String flywayCleanString = "-user=${configMap.DEFAULTDS_USERNAME} -password=${configMap.DEFAULTDS_PASSWORD} -url=${configMap.DEFAULTDS_URL} clean"
-                        println("Running clean command")
-                        sh "flyway $flywayCleanString"
-                        println("Clean command finished")
-
-                    }
-                }
-
                 stage("Setup keystores") {
                     keystores.generateKeystoreAndTruststore("vtp")
                 }
 
-                stage("Start VTP") {
-                    sh(script: "rm -f vpt.env")
-                    sh(script: "echo JAVAX_NET_SSL_TRUSTSTORE=/root/.modig/truststore.jks >> vtp.env")
-                    sh(script: "echo JAVAX_NET_SSL_TRUSTSTOREPASSWORD=changeit >> vtp.env")
-                    sh(script: "echo NO_NAV_MODIG_SECURITY_APPCERT_PASSWORD=devillokeystore1234 >> vtp.env")
-                    sh(script: "echo NO_NAV_MODIG_SECURITY_APPCERT_KEYSTORE=/root/.modig/keystore.jks >> vtp.env")
-                    sh(script: "echo ISSO_OAUTH2_ISSUER=https://vtp:8063/rest/isso/oauth2 >> vtp.env")
-                    sh(script: "echo VTP_KAFKA_HOST=localhost:9093 >> vtp.env")
-
-                    sh "docker run -d --name vtp --env-file vtp.env -v $workspace/.modig:/root/.modig -p 8636:8636 -p 8063:8063 -p 8060:8060 -p 8001:8001 -p 9093:9093  ${dockerRegistry}/vtp:${vtpVersjon}"
+                //TODO: Gjør denne generisk
+                stage("Start andre avhengigheter"){
+                    if(applikasjon.equalsIgnoreCase("fpsak")) {
+                        def (abakus_version, msg) = nais.getAppVersion("preprod-fss", "t4", "fpabakus")
+                        echo "abakusversjon = ${dockerRegistry}/fpabakus:$abakus_version"
+                        sh(script: "export ABAKUS_IMAGE=${dockerRegistry}/fpabakus:${abakus_version}")
+                        sh(script: "export VTP_IMAGE=${dockerRegistry}/vtp:${vtpVersjon}")
+                        sh(script: "docker-compose -f $workspace/resources/pipeline/fpsak-docker-compose.yml up")
+                    }
                 }
 
                 stage("Start SUT") {
@@ -157,7 +139,12 @@ def call(body) {
                     def host_ip = sh(script: "host a01apvl00312.adeo.no | sed 's/.*.\\s//'", returnStdout: true).trim()
                     println "Host: " + host_ip
 
-                    sh "docker run -d --name $applikasjon --add-host=host.docker.internal:${host_ip} -v $workspace/.modig:/var/run/secrets/naisd.io/ --env-file sut.env  --env-file $workspace/resources/pipeline/autotest.list --env-file $workspace/resources/pipeline/" + params.applikasjon + "_datasource.list -p 8080:8080 -p 8000:8000 --link vtp:vtp " + dockerRegistry + "/$applikasjon:$sutToRun"
+                    //TODO: Gjør denne generisk
+                    if(applikasjon.equalsIgnoreCase("fpsak")){
+                        sh "docker run -d --name $applikasjon --add-host=host.docker.internal:${host_ip} -v $workspace/.modig:/var/run/secrets/naisd.io/ --env-file sut.env  --env-file $workspace/resources/pipeline/autotest.list --env-file $workspace/resources/pipeline/" + params.applikasjon + "_datasource.list -p 8080:8080 -p 8000:8000 --link vtp:vtp --link abakus:abakus " + dockerRegistry + "/$applikasjon:$sutToRun"
+                    } else {
+                        sh "docker run -d --name $applikasjon --add-host=host.docker.internal:${host_ip} -v $workspace/.modig:/var/run/secrets/naisd.io/ --env-file sut.env  --env-file $workspace/resources/pipeline/autotest.list --env-file $workspace/resources/pipeline/" + params.applikasjon + "_datasource.list -p 8080:8080 -p 8000:8000 --link vtp:vtp " + dockerRegistry + "/$applikasjon:$sutToRun"
+                    }
                 }
 
                 stage("Verifiserer VTP") {
@@ -228,50 +215,6 @@ def call(body) {
                     }
                 }
 
-                stage("Notify") {
-                    echo "verdien av rc er: " + rc
-
-                    //TODO: Fjern eksplisitt sjekk på FPSAK når SPBEREGNING også er rapporterbar
-                    echo "currentBuild.result er: " + currentBuild.result
-                    def allureUrl = "https://jenkins-familie.adeo.no/job/Foreldrepenger/job/autotest-${applikasjon}/${env.BUILD_NUMBER}/allure/"
-
-
-                    def testStatus = makeTestStatus(currentBuild.rawBuild.getAction(AbstractTestResultAction.class), allureUrl)
-                    println("Skal skrive status til kanal: " + testStatus)
-
-
-                    if (profil.equalsIgnoreCase("spberegning") || profil.equalsIgnoreCase('fpsak')) {
-                        if (currentBuild.result == 'FAILURE' || currentBuild.result == 'ABORTED') {
-                            if (rc == 'true' && applikasjon == 'fpsak') {
-                                slackSend(color: "#FF0000", channel: "fp-go-no-go", message: "VTP Autotest feilet for release-kandidat (" + applikasjon + " [" + applikasjonVersjon + "]). " + testStatus)
-                                println("RC: Logget feil til kanal")
-                            }
-
-                            if (applikasjon == 'spberegning' && rc == 'false') {
-                                slackSend(color: "#FF0000", channel: "spberegning-alerts", message: "VTP Autotest feilet (" + applikasjon + " [" + applikasjonVersjon + "]). " + testStatus + "\nEndringer:\n" + changelog)
-                                println("Master build: Logget feil til kanal for spberegning")
-                            }
-
-                            slackSend(color: "#FF0000", channel: "vtp-autotest-resultat", message: "VTP Autotest feilet (" + applikasjon + " [" + applikasjonVersjon + "]). " + testStatus + "\nEndringer:\n" + changelog)
-                            println("Master build: Logget feil til kanal")
-
-                        } else {
-                            if (rc == 'true' && applikasjon == 'fpsak') {
-                                slackSend(color: "#00FF00", channel: "fp-go-no-go", message: "VTP Autotest kjørt uten feil for release-kandidat (" + applikasjon + " [" + applikasjonVersjon + "]). " + testStatus)
-                                println("RC: Logget suksess til kanal")
-                            }
-
-                            if (applikasjon == 'spberegning' && rc == 'false') {
-                                slackSend(color: "#00FF00", channel: "spberegning-alerts", message: "VTP Autotest kjørt uten feil (" + applikasjon + " [" + applikasjonVersjon + "]). " + testStatus + "\nEndringer:\n" + changelog)
-                                println("Master build: Logget suksess til kanal for spberegning")
-                            }
-
-                            slackSend(color: "#00FF00", channel: "vtp-autotest-resultat", message: "VTP Autotest kjørt uten feil (" + applikasjon + " [" + applikasjonVersjon + "]). " + testStatus + "\nEndringer:\n" + changelog)
-                            println("Master build: Logget suksess til kanal")
-                        }
-                    }
-                    testResultAction = null
-                }
             } catch (Exception e) {
                 println("Bygg feilet: $e")
                 slackSend(color: "#FF0000", channel: "vtp-autotest-resultat", message: "Noe gikk feil - Autotest feilet uten testkjøring (" + applikasjon + " [" + applikasjonVersjon + "]) "+ e.getMessage())
