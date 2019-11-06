@@ -130,7 +130,7 @@ def call(body) {
                         sh "export ABAKUS_IMAGE=${dockerRegistry}/fpabakus:${abakus_version} &&" +
                         "export VTP_IMAGE=${dockerRegistry}/vtp:${vtpVersjon} &&" +
                         "export WORKSPACE=${workspace} &&" +
-                        "docker-compose -f $workspace/resources/pipeline/fpsak-docker-compose.yml -d up"
+                        "docker-compose -f $workspace/resources/pipeline/fpsak-docker-compose.yml up -d"
                     }
                 }
 
