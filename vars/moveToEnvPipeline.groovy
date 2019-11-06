@@ -7,6 +7,7 @@ def call () {
     def k8DeployGitURL = [fpformidling:     'git@fp-formidling.github.com:navikt/fp-formidling.git', 
                           spberegning:      'git@spberegning.github.com:navikt/spberegning.git', 
                           fpabakus:         'git@fp-abakus.github.com:navikt/fp-abakus.git',
+                          fpfordel:         'git@fpfordel.github.com:navikt/fpfordel.git',
                           "fpsak-frontend": 'git@fpsak-frontend.github.com:navikt/fpsak-frontend.git']
         
     pipeline {
