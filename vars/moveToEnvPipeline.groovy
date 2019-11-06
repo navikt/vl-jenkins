@@ -79,7 +79,7 @@ def call () {
                       steps {
                           script {
                               if (params.fpfordel) {
-                                deployk8('fpfordel', fromNs, toNs, k8DeployGitURL.get('fpfordel'))
+                                deployJira('fpfordel', fromNs, toNs)
                               }
                           }
                        }
@@ -231,7 +231,7 @@ def deployk8(String artifactId, String from, String to, String scmURL) {
                 }
             }                        
         } else {
-          error('Deploy av $artifactId feilet! Fant ikke katalogen k8.')
+          error('Deploy av $artifactId feilet! Fant ikke katalogen k8s.')
         }
     }    
 }
