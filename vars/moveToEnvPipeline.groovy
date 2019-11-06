@@ -79,7 +79,7 @@ def call () {
                       steps {
                           script {
                               if (params.fpfordel) {
-                                deployJira('fpfordel', fromNs, toNs)
+                                deployk8('fpfordel', fromNs, toNs, k8DeployGitURL.get('fpformidling'))
                               }
                           }
                        }
