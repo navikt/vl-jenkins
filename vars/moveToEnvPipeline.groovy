@@ -79,7 +79,7 @@ def call () {
                       steps {
                           script {
                               if (params.fpfordel) {
-                                deployk8('fpfordel', fromNs, toNs, k8DeployGitURL.get('fpformidling'))
+                                deployk8('fpfordel', fromNs, toNs, k8DeployGitURL.get('fpfordel'))
                               }
                           }
                        }
