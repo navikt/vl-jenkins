@@ -123,7 +123,8 @@ def call(body) {
                 //TODO: Gjør denne generisk
                 stage("Start andre avhengigheter"){
                     if(applikasjon.equalsIgnoreCase("fpsak")) {
-                        def (abakus_version, msg) = nais.getAppVersion("preprod-fss", "t4", "fpabakus")
+                        abakus_version = sh(script: "git ls-remote --tags git@fp-abakus.github.com:navikt/fp-abakus.git | sort -t '/' -k 3 -V | tail -2 | head -1 | grep -o '[^\\/]*\$'", returnStdout: true)?.trim();
+
                         echo "abakusversjon = ${dockerRegistry}/fpabakus:$abakus_version"
                         sh(script: "export ABAKUS_IMAGE=${dockerRegistry}/fpabakus:${abakus_version}")
                         sh(script: "export VTP_IMAGE=${dockerRegistry}/vtp:${vtpVersjon}")
