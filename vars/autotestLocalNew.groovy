@@ -127,9 +127,9 @@ def call(body) {
                         abakus_version = sh(script: "git ls-remote --tags git@fp-abakus.github.com:navikt/fp-abakus.git | sort -t '/' -k 3 -V | tail -2 | head -1 | grep -o '[^\\/]*\$'", returnStdout: true)?.trim();
 
                         echo "abakusversjon = ${dockerRegistry}/fpabakus:$abakus_version"
-                        sh "export ABAKUS_IMAGE=${dockerRegistry}/fpabakus:${abakus_version} &&" /
-                        "export VTP_IMAGE=${dockerRegistry}/vtp:${vtpVersjon} &&" /
-                        "export WORKSPACE=${workspace} &&" /
+                        sh "export ABAKUS_IMAGE=${dockerRegistry}/fpabakus:${abakus_version} &&" +
+                        "export VTP_IMAGE=${dockerRegistry}/vtp:${vtpVersjon} &&" +
+                        "export WORKSPACE=${workspace} &&" +
                         "docker-compose -f $workspace/resources/pipeline/fpsak-docker-compose.yml up"
                     }
                 }
