@@ -144,7 +144,7 @@ def call(body) {
 
                     //TODO: Gjør denne generisk
                     if(applikasjon.equalsIgnoreCase("fpsak")){
-                        sh "docker run -d --name $applikasjon --add-host=host.docker.internal:${host_ip} -v $workspace/.modig:/var/run/secrets/naisd.io/ --env-file sut.env  --env-file $workspace/resources/pipeline/autotest.list --env-file $workspace/resources/pipeline/" + params.applikasjon + "_datasource.list -p 8080:8080 -p 8000:8000 --link vtp:vtp --link abakus:abakus " + dockerRegistry + "/$applikasjon:$sutToRun"
+                        sh "docker run -d --name $applikasjon --add-host=host.docker.internal:${host_ip} -v $workspace/.modig:/var/run/secrets/naisd.io/ --env-file sut.env  --env-file $workspace/resources/pipeline/autotest.list --env-file $workspace/resources/pipeline/" + params.applikasjon + "_datasource.list -p 8080:8080 -p 8000:8000 --link vtp:vtp --link abakus:abakus --network=\"pipeline_default\" " + dockerRegistry + "/$applikasjon:$sutToRun"
                     } else {
                         sh "docker run -d --name $applikasjon --add-host=host.docker.internal:${host_ip} -v $workspace/.modig:/var/run/secrets/naisd.io/ --env-file sut.env  --env-file $workspace/resources/pipeline/autotest.list --env-file $workspace/resources/pipeline/" + params.applikasjon + "_datasource.list -p 8080:8080 -p 8000:8000 --link vtp:vtp " + dockerRegistry + "/$applikasjon:$sutToRun"
                     }
