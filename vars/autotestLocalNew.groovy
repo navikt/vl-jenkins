@@ -123,11 +123,13 @@ def call(body) {
                 //TODO: Gjør denne generisk
                 stage("Start andre avhengigheter"){
                     if(applikasjon.equalsIgnoreCase("fpsak")) {
+                        def workspace = pwd()
                         abakus_version = sh(script: "git ls-remote --tags git@fp-abakus.github.com:navikt/fp-abakus.git | sort -t '/' -k 3 -V | tail -2 | head -1 | grep -o '[^\\/]*\$'", returnStdout: true)?.trim();
 
                         echo "abakusversjon = ${dockerRegistry}/fpabakus:$abakus_version"
                         sh(script: "export ABAKUS_IMAGE=${dockerRegistry}/fpabakus:${abakus_version}")
                         sh(script: "export VTP_IMAGE=${dockerRegistry}/vtp:${vtpVersjon}")
+                        sh(script: "export WORKSPACE=${workspace}")
                         sh(script: "docker-compose -f $workspace/resources/pipeline/fpsak-docker-compose.yml up")
                     }
                 }
@@ -218,7 +220,6 @@ def call(body) {
 
             } catch (Exception e) {
                 println("Bygg feilet: $e")
-                slackSend(color: "#FF0000", channel: "vtp-autotest-resultat", message: "Noe gikk feil - Autotest feilet uten testkjøring (" + applikasjon + " [" + applikasjonVersjon + "]) "+ e.getMessage())
                 println(e.getMessage())
                 currentBuild.result = 'FAILURE'
             } finally {
