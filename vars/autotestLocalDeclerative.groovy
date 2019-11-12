@@ -54,9 +54,9 @@ def call() {
             stage("Init") {
                 steps {
                     script {
-                        //TODO: Må hardcodede verdier når denne blir tatt i bruk!
+                        //TODO: applikasjon, applikasjonVersjon og changelog er brukt for testing. Fjern ved bruk.
                         applikasjon = "fpsak"
-                        applikasjonVerssjon = "3.1.0_20191111105625_6eb1db9"
+                        applikasjonVersjon = "3.1.0_20191111105625_6eb1db9"
                         changelog = " SOMETHING "
 
                         if (params.profil == "") {
@@ -151,8 +151,8 @@ def call() {
                         def workspace = pwd()
                         def host_ip = sh(script: "host a01apvl00312.adeo.no | sed 's/.*.\\s//'", returnStdout: true).trim()
                         println "Host: " + host_ip
-
                         String sutToRun = applikasjonVersjon
+
                         sh(script: "docker run -d --name $applikasjon --add-host=host.docker.internal:$host_ip -v $workspace/.modig:/var/run/secrets/naisd.io/ --env-file sut.env  --env-file $workspace/resources/pipeline/autotest.list --env-file $workspace/resources/pipeline/${applikasjon}_datasource.list -p 8080:8080 -p 8000:8000 --link vtp:vtp $DOCKERREGISTRY/$applikasjon:$sutToRun")
                     }
 
@@ -308,7 +308,7 @@ def call() {
 }
 
 def infoSlack(String color, String channel, String msg){
-    String channel_change = "vtp-test-test"
-    //TODO: Må channel_change -> channel når denne blir implementert!
-    slackSend(color: color, channel: channel_change, message: msg)
+    String channel_hardkodet = "vtp-test-test"
+    //TODO: Må fjerne channel_hardkodet og erstatte argumentet med channel før bruk.
+    slackSend(color: color, channel: channel_hardkodet, message: msg)
 }
