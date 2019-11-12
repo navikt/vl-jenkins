@@ -54,10 +54,6 @@ def call() {
             stage("Init") {
                 steps {
                     script {
-                        //TODO: applikasjon, applikasjonVersjon og changelog er brukt for testing. Fjern ved bruk.
-                        applikasjon = "fpsak"
-                        applikasjonVersjon = "3.1.0_20191111105625_6eb1db9"
-                        changelog = " SOMETHING "
 
                         if (params.profil == "") {
                             echo "Ingen testprofil oppgitt, setter til default samme som applikasjonsnavn: " + params.applikasjon
