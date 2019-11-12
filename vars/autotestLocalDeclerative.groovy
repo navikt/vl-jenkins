@@ -28,8 +28,8 @@ def call() {
     def applikasjon = params.applikasjon
     def applikasjonVersjon = params.applikasjonVersjon
     def changelog = params.changelog
-    def profil
     def rc = params.rc
+    def profil
 
     pipeline {
         agent { label 'VTPAUTOTEST' }
@@ -56,8 +56,8 @@ def call() {
                     script {
 
                         if (params.profil == "") {
-                            echo "Ingen testprofil oppgitt, setter til default samme som applikasjonsnavn: " + params.applikasjon
-                            profil = params.applikasjon
+                            echo "Ingen testprofil oppgitt, setter til default samme som applikasjonsnavn: " + applikasjon
+                            profil = applikasjon
                         } else {
                             echo "Overstyrer default testprofil med: " + params.profil
                             profil = params.profil
