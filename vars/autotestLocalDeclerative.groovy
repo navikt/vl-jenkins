@@ -67,9 +67,6 @@ def call() {
                             profil = params.profil
                         }
 
-                        cleanWs()
-                        checkout scm
-
                         vtpVersjon = sh(script: "git ls-remote --tags git@vtp.github.com:navikt/vtp.git | sort -t '/' -k 3 -V | tail -2 | head -1 | grep -o '[^\\/]*\$'", returnStdout: true)?.trim()
                         autotestVersjon = sh(script: "git rev-parse HEAD", returnStdout: true)?.trim()
                         println "Using VTP version '${vtpVersjon}'"
