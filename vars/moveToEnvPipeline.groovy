@@ -227,7 +227,7 @@ def deployk8(String artifactId, String from, String to, String scmURL) {
                 echo "exit code is $exitCode"
                 
                 if (exitCode == 0) {
-                    slackMessage("_Deploy av $artifactId:$version til $to var suksessfult._", msgColor) 
+                    slackMessage("_Deploy av $artifactId:$version til $to var vellykket._", msgColor) 
                 }
             }                        
         } else {
