@@ -200,7 +200,7 @@ def call() {
                                             ignoreSslErrors       : true
                                     ])
                                 }
-                                slackInfo(msgColor, "_Deploy av $ARTIFACTID:$version til $MILJO var suksessfult._")
+                                slackInfo(msgColor, "_Deploy av $ARTIFACTID:$version til $MILJO var vellykket._")
                             }
                         } else if (ARTIFACTID == 'vtp'){
                             echo "$ARTIFACTID deployes ikke til miljøene"
