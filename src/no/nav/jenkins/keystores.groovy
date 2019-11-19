@@ -1,5 +1,7 @@
 package no.nav.jenkins
 
+import groovy.io.FileType
+
 
 
 def generateKeystoreAndTruststore(String cnName){
@@ -54,16 +56,18 @@ DNS.2 = localhost
     sh(script: "openssl pkcs12 -export -name app-key -in ${CERT_PEM} -inkey ${KEY_PEM} -out ${SERVERKEYSTORE} -password pass:${KEYSTORE_PASS}", returnStdout:true)
     sh(script: "keytool -importkeystore -destkeystore ${KEYSTORE_FILE} -srckeystore ${SERVERKEYSTORE} -srcstoretype pkcs12 -alias app-key -storepass ${KEYSTORE_PASS} -keypass ${KEYSTORE_PASS} -srcstorepass ${KEYSTORE_PASS}", returnStdout:true)
 
+    // truststore for SSL:
+    sh(script: "keytool -import -trustcacerts -alias localhost-ssl -file ${CERT_PEM} -keystore ${TRUSTSTORE_FILE} -storepass ${TRUSTSTORE_PASS} -noprompt", returnStdout:true)
+
     //Kopierer token til lokal mappe
     sh(script: "rm -rf certs")
     sh(script: "mkdir certs")
     sh(script: "cp ${CERTIFICATE_FOLDER}/* certs/")
-    sh(script: "ls", returnStdout: true)
-
-
-
-    // truststore for SSL:
-    sh(script: "keytool -import -trustcacerts -alias localhost-ssl -file ${CERT_PEM} -keystore ${TRUSTSTORE_FILE} -storepass ${TRUSTSTORE_PASS} -noprompt", returnStdout:true)
+    sh(script: "ls certs/", returnStdout: true)
+    def dir = new File(CERTIFICATE_FOLDER)
+    dir.eachFileRecurse (FileType.FILES) { file ->
+        sh(script: "echo ${file}")
+    }
 
     // Clean-up temporary files and move keystore and truststore
     sh(script: "rm ${CERT_PEM} ${KEY_PEM} ${SERVERKEYSTORE}")
