@@ -64,10 +64,10 @@ DNS.2 = localhost
     sh(script: "mkdir certs")
     sh(script: "cp ${CERTIFICATE_FOLDER}/* certs/")
     sh(script: "ls certs/", returnStdout: true)
-    def dir = new File(CERTIFICATE_FOLDER)
-    dir.eachFileRecurse (FileType.FILES) { file ->
-        sh(script: "echo ${file}")
-    }
+ //   def dir = new File(CERTIFICATE_FOLDER)
+ //   dir.eachFileRecurse (FileType.FILES) { file ->
+ //       sh(script: "echo ${file}")
+ //   }
 
     // Clean-up temporary files and move keystore and truststore
     sh(script: "rm ${CERT_PEM} ${KEY_PEM} ${SERVERKEYSTORE}")
