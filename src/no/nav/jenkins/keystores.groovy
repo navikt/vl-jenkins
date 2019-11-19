@@ -39,6 +39,7 @@ extendedKeyUsage = serverAuth
 [ alt_names ]
 DNS.1 = vtp
 DNS.2 = localhost
+DNS.3 = abakus
 """
 
     // local-host SSL
