@@ -83,7 +83,7 @@ def call(body) {
                     step([$class: 'WsCleanup'])
                     checkout scm
 
-                    vtpVersjon = sh(script: "git ls-remote --tags git@vtp.github.com:navikt/vtp.git | sort -t '/' -k 3 -V | tail -2 | head -1 | grep -o '[^\\/]*\$'", returnStdout: true)?.trim();
+                    vtpVersjon = sh(script: "git ls-remote --tags git@vtp.github.com:navikt/vtp.git | grep -o '[^\\/]*\$' | sort -t '_' -k 1 -g | tail -n 2 | head -1'", returnStdout: true)?.trim();
 
 
 
@@ -124,7 +124,7 @@ def call(body) {
                 stage("Start andre avhengigheter"){
                     if(applikasjon.equalsIgnoreCase("fpsak")) {
                         def workspace = pwd()
-                        abakus_version = sh(script: "git ls-remote --tags git@fp-abakus.github.com:navikt/fp-abakus.git | sort -t '/' -k 3 -V | tail -2 | head -1 | grep -o '[^\\/]*\$'", returnStdout: true)?.trim();
+                        abakus_version = sh(script: "git ls-remote --tags git@fp-abakus.github.com:navikt/fp-abakus.git | grep -o '[^\\/]*\$' | sort -t '_' -k 1 -g | tail -n 2 | head -1'", returnStdout: true)?.trim();
 
                         echo "abakusversjon = ${dockerRegistry}/fpabakus:$abakus_version"
                         sh "export ABAKUS_IMAGE=${dockerRegistry}/fpabakus:${abakus_version} &&" +
