@@ -47,7 +47,7 @@ def call(body) {
                             println("Kjører test av ny pipeline")
                             build job: "autotest-${application}-new", parameters: params
                         } else {
-                            build job: "autotest-${application}-new", parameters: params
+                            build job: "autotest-${application}", parameters: params
                         }
                     } else {
                         println("Applikasjonen ${application} støttes ikke")
