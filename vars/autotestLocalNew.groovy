@@ -124,7 +124,7 @@ def call(body) {
                 stage("Start andre avhengigheter"){
                     if(applikasjon.equalsIgnoreCase("fpsak")) {
                         def workspace = pwd()
-                        abakus_version = sh(script: "git ls-remote --tags git@fp-abakus.github.com:navikt/fp-abakus.git | grep -o '[^\\/]*\$' | sort -t '_' -k 1 -g | tail -n 2 | head -1'", returnStdout: true)?.trim();
+                        abakus_version = sh(script: "git ls-remote --tags git@fp-abakus.github.com:navikt/fp-abakus.git | grep -o '[^\\/]*\$' | sort -t '_' -k 1 -g | tail -n 2 | head -1", returnStdout: true)?.trim();
 
                         echo "abakusversjon = ${dockerRegistry}/fpabakus:$abakus_version"
                         sh "export ABAKUS_IMAGE=${dockerRegistry}/fpabakus:${abakus_version} &&" +
