@@ -40,6 +40,7 @@ extendedKeyUsage = serverAuth
 DNS.1 = vtp
 DNS.2 = localhost
 DNS.3 = abakus
+DNS.4 = fpabakus
 """
 
     // local-host SSL
