@@ -24,9 +24,11 @@ def call() {
     def autotestVersjon = "latest"
     def keystores = new keystores()
     def dockerLokal = new dockerLocal()
+    def nais = new nais()
 
     def applikasjon = params.applikasjon
     def applikasjonVersjon = params.applikasjonVersjon
+    def sutToRun = params.applikasjonVersjon
     def changelog = params.changelog
     def rc = params.rc
     def profil
@@ -97,8 +99,8 @@ def call() {
             stage("Pull") {
                 steps {
                     script {
-                        sh(script: "docker pull $dockerRegistry/$applikasjon:$applikasjonVersjon")
-                        sh(script: "docker pull $dockerRegistry/vtp:$vtpVersjon")
+                        sh(script: "docker pull $DOCKERREGISTRY/$applikasjon:$applikasjonVersjon")
+                        sh(script: "docker pull $DOCKERREGISTRY/vtp:$vtpVersjon")
                     }
                 }
             }
@@ -122,18 +124,20 @@ def call() {
                 }
             }
 
-            stage("Start VTP") {
+            //TODO: Gjør denne generisk
+            stage("Start andre avhengigheter") {
                 steps {
                     script {
-                        sh(script: "rm -f vpt.env")
-                        sh(script: "echo JAVAX_NET_SSL_TRUSTSTORE=/root/.modig/truststore.jks >> vtp.env")
-                        sh(script: "echo JAVAX_NET_SSL_TRUSTSTOREPASSWORD=changeit >> vtp.env")
-                        sh(script: "echo NO_NAV_MODIG_SECURITY_APPCERT_PASSWORD=devillokeystore1234 >> vtp.env")
-                        sh(script: "echo NO_NAV_MODIG_SECURITY_APPCERT_KEYSTORE=/root/.modig/keystore.jks >> vtp.env")
-                        sh(script: "echo ISSO_OAUTH2_ISSUER=https://vtp:8063/rest/isso/oauth2 >> vtp.env")
-                        sh(script: "echo VTP_KAFKA_HOST=localhost:9093 >> vtp.env")
+                        if(applikasjon.equalsIgnoreCase("fpsak")) {
+                            def workspace = pwd()
+                            abakus_version = sh(script: "git ls-remote --tags git@fp-abakus.github.com:navikt/fp-abakus.git | grep -o '[^\\/]*\$' | sort -t '_' -k 1 -g | tail -n 2 | head -1", returnStdout: true)?.trim();
 
-                        sh(script: "docker run -d --name vtp --env-file vtp.env -v $workspace/.modig:/root/.modig -p 8636:8636 -p 8063:8063 -p 8060:8060 -p 8001:8001 -p 9093:9093  ${DOCKERREGISTRY}/vtp:${vtpVersjon}")
+                            echo "abakusversjon = ${DOCKERREGISTRY}/fpabakus:${abakus_version}"
+                            sh(script:  "export ABAKUS_IMAGE=${DOCKERREGISTRY}/fpabakus:${abakus_version} &&" +
+                                        "export VTP_IMAGE=${DOCKERREGISTRY}/vtp:${vtpVersjon} &&" +
+                                        "export WORKSPACE=${workspace} &&" +
+                                        "docker-compose -f ${workspace}/resources/pipeline/fpsak-docker-compose.yml up -d")
+                        }
                     }
                 }
             }
@@ -147,11 +151,15 @@ def call() {
                         def workspace = pwd()
                         def host_ip = sh(script: "host a01apvl00312.adeo.no | sed 's/.*.\\s//'", returnStdout: true).trim()
                         println "Host: " + host_ip
-                        String sutToRun = applikasjonVersjon
 
-                        sh(script: "docker run -d --name $applikasjon --add-host=host.docker.internal:$host_ip -v $workspace/.modig:/var/run/secrets/naisd.io/ --env-file sut.env  --env-file $workspace/resources/pipeline/autotest.list --env-file $workspace/resources/pipeline/${applikasjon}_datasource.list -p 8080:8080 -p 8000:8000 --link vtp:vtp $DOCKERREGISTRY/$applikasjon:$sutToRun")
+                        //TODO: Gjør denne generisk
+                        if(applikasjon.equalsIgnoreCase("fpsak")){
+                            println "Hva som helst"
+                            sh(script: "docker run -d --name $applikasjon --add-host=host.docker.internal:${host_ip} -v $workspace/.modig:/var/run/secrets/naisd.io/ --env-file sut.env  --env-file $workspace/resources/pipeline/autotest.list --env-file $workspace/resources/pipeline/${applikasjon}_datasource.list -p 8080:8080 -p 8000:8000  --network=\"pipeline_autotestverk\" $DOCKERREGISTRY/$applikasjon:$sutToRun")
+                        } else {
+                            sh(script: "docker run -d --name $applikasjon --add-host=host.docker.internal:${host_ip} -v $workspace/.modig:/var/run/secrets/naisd.io/ --env-file sut.env  --env-file $workspace/resources/pipeline/autotest.list --env-file $workspace/resources/pipeline/${applikasjon}_datasource.list -p 8080:8080 -p 8000:8000 --link vtp:vtp $DOCKERREGISTRY/$applikasjon:$sutToRun")
+                        }
                     }
-
                 }
             }
 
@@ -200,15 +208,15 @@ def call() {
                             configFileProvider([configFile(fileId: 'navMavenSettings', variable: 'MAVEN_SETTINGS')]) {
                                 println "Workspace = " + workspace
 
-                                sh(script: "export JAVAX_NET_SSL_TRUSTSTORE=${workspace}/.modig/truststore.jks")
-                                sh(script: "export JAVAX_NET_SSL_TRUSTSTOREPASSWORD=changeit")
-                                sh(script: "export NO_NAV_MODIG_SECURITY_APPCERT_PASSWORD=devillokeystore1234")
-                                sh(script: "export NO_NAV_MODIG_SECURITY_APPCERT_KEYSTORE=${workspace}/.modig/keystore.jks")
+                                sh(script:  "export JAVAX_NET_SSL_TRUSTSTORE=${workspace}/.modig/truststore.jks")
+                                sh(script:  "export JAVAX_NET_SSL_TRUSTSTOREPASSWORD=changeit")
+                                sh(script:  "export NO_NAV_MODIG_SECURITY_APPCERT_PASSWORD=devillokeystore1234")
+                                sh(script:  "export NO_NAV_MODIG_SECURITY_APPCERT_KEYSTORE=${workspace}/.modig/keystore.jks")
 
-                                sh(script: 'export AUTOTEST_ENV=pipeline && ' +
-                                        "export NO_NAV_MODIG_SECURITY_APPCERT_KEYSTORE=${workspace}/.modig/keystore.jks && " +
-                                        'export NO_NAV_MODIG_SECURITY_APPCERT_PASSWORD=devillokeystore1234 && ' +
-                                        ' mvn test -s $MAVEN_SETTINGS -P ' + profil + ' -DargLine="AUTOTEST_ENV=pipepipe"')
+                                sh(script:  'export AUTOTEST_ENV=pipeline && ' +
+                                            "export NO_NAV_MODIG_SECURITY_APPCERT_KEYSTORE=${workspace}/.modig/keystore.jks && " +
+                                            'export NO_NAV_MODIG_SECURITY_APPCERT_PASSWORD=devillokeystore1234 && ' +
+                                            ' mvn test -s $MAVEN_SETTINGS -P ' + profil + ' -DargLine="AUTOTEST_ENV=pipepipe"')
                             }
 
                         } catch (error) {
