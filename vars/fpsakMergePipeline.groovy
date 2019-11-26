@@ -1,6 +1,7 @@
 import no.nav.jenkins.*
 
 def call() {
+import no.nav.jenkins.*
 
   String mvnVersionParams = ''
 
@@ -24,10 +25,7 @@ def call() {
         environment {
             LANG = "nb_NO.UTF-8"
         }
-
-
-        node('BUILD') {
-
+        stages {
             stage ('Merge') {
                 steps {
                     script {
@@ -100,7 +98,7 @@ def call() {
 
                             env.MAVEN_OPTS = "-Xms256m -Xmx512m"
                             String mavenProperties = maven.properties()
-                            String flywayConig = " -Dflyway.placeholders.vl_${artifactId}_hist_schema_unit=${schemaNavnFPSAK_HIST} -Dflyway.placeholders.vl_${artifactId}_schema_unit=${schemaNavnFPSAK}"
+                            String flywayConig = " -Dflyway.placeholders.vl_${artifactId}_hist_schema_unit=$schemaNavnFPSAK_HIST -Dflyway.placeholders.vl_${artifactId}_schema_unit=$schemaNavnFPSAK"
 
                             sh "export APPDATA=web/klient/node/node_modules/npm/bin;" +
                                     " mvn $mavenFlagg -B -s $MAVEN_SETTINGS $mavenProperties $mvnVersionParams $flywayConig" +
@@ -125,6 +123,7 @@ def call() {
                 }
             }
         }
+        
     }
 }
 
