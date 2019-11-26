@@ -5,7 +5,7 @@ import com.cloudbees.groovy.cps.NonCPS
 @NonCPS
 def makeTestStatus(currentBuild, allureUrl) {
     String testStatus = ""
-    testResultAction = currentBuild.rawBuild.getAction(AbstractTestResultAction.class)
+    def testResultAction = currentBuild.rawBuild.getAction(AbstractTestResultAction.class)
     if (testResultAction != null) {
         def total = testResultAction.totalCount
         def failed = testResultAction.failCount
@@ -24,7 +24,6 @@ def call() {
     def autotestVersjon = "latest"
     def keystores = new keystores()
     def dockerLokal = new dockerLocal()
-    def nais = new nais()
 
     def applikasjon = params.applikasjon
     def applikasjonVersjon = params.applikasjonVersjon
@@ -105,6 +104,7 @@ def call() {
                 }
             }
 
+            //TODO: Fjern eller implementer
             stage("Clean db") {
                 when {
                     expression { params.clean == true }
@@ -205,6 +205,7 @@ def call() {
                 steps {
                     script {
                         try {
+                            def workspace = pwd()
                             configFileProvider([configFile(fileId: 'navMavenSettings', variable: 'MAVEN_SETTINGS')]) {
                                 println "Workspace = " + workspace
 
@@ -246,8 +247,9 @@ def call() {
                         echo "verdien av rc er: " + rc
 
                         //TODO: Fjern eksplisitt sjekk på FPSAK når SPBEREGNING også er rapporterbar
+                        //TODO: HARDCODET autotest-fpsak-new
                         echo "currentBuild.result er: " + currentBuild.result
-                        def allureUrl = "https://jenkins-familie.adeo.no/job/Foreldrepenger/job/autotest-${applikasjon}/${env.BUILD_NUMBER}/allure/"
+                        def allureUrl = "https://jenkins-familie.adeo.no/job/Foreldrepenger/job/autotest-${applikasjon}-new/${env.BUILD_NUMBER}/allure/"
 
 
                         def testStatus = makeTestStatus(currentBuild, allureUrl)
@@ -284,7 +286,6 @@ def call() {
                                 println("Master build: Logget suksess til kanal")
                             }
                         }
-                        testResultAction = null
                     }
                 }
             }
