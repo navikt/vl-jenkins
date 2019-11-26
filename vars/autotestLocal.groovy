@@ -265,6 +265,7 @@ def call(body) {
             } catch (Exception e) {
                 println("Bygg feilet: $e")
                 println(e.getMessage())
+                slackSend(color: "#FF0000", channel: "vtp-autotest-resultat", message: "Noe gikk feil - Autotest feilet uten testkjøring (" + applikasjon + " [" + applikasjonVersjon + "]) "+ e.getMessage())
                 currentBuild.result = 'FAILURE'
             } finally {
                 //TODO: Må endres når vi skal kjøre i parallell
