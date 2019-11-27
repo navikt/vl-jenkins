@@ -116,7 +116,6 @@ def call() {
                         script {
                           currentBuild.result = 'FAILURE'
                           notify(params.PULL_REQUEST_FROM_HASH)
-                          throw error
                         }
                     }
                 }
