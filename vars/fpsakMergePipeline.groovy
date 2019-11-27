@@ -1,7 +1,6 @@
 import no.nav.jenkins.*
 
 def call() {
-import no.nav.jenkins.*
 
   String mvnVersionParams = ''
 
