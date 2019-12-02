@@ -22,6 +22,9 @@ def call(body) {
     body.delegate = config
     body()
 
+    dockerRegistryGitHub = "docker.pkg.github.com/navikt"
+    ABAKUS_HARDKODET_VERSJON = "20191202162452-9332572"
+
     def selftestUrls = [fpsak: "/fpsak/internal/health/selftest", spberegning: "/spberegning/internal/selftest", fprisk: "/fprisk/internal/selftest"]
 
 
@@ -70,7 +73,9 @@ def call(body) {
 
                 String nyTag = "autotest"
                 String sutToRun = applikasjonVersjon
-                String dockerRegistry = "repo.adeo.no:5443"
+                String dockerRegistryAdeo = "repo.adeo.no:5443"
+                String dockerRegistryGitHub = "docker.pkg.github.com/navikt"
+                String ABAKUS_HARDKODET_VERSJON = "20191202162452-9332572"
                 def vtpVersjon = "latest"
                 def autotestVersjon = "latest"
 
@@ -112,8 +117,8 @@ def call(body) {
                 }
 
                 stage("Pull") {
-                    sh "docker pull $dockerRegistry/$applikasjon:$params.applikasjonVersjon"
-                    sh "docker pull $dockerRegistry/vtp:$vtpVersjon"
+                    sh "docker pull $dockerRegistryAdeo/$applikasjon:$params.applikasjonVersjon"
+                    sh "docker pull $dockerRegistryAdeo/vtp:$vtpVersjon"
                 }
 
                 stage("Setup keystores") {
@@ -124,11 +129,11 @@ def call(body) {
                 stage("Start andre avhengigheter"){
                     if(applikasjon.equalsIgnoreCase("fpsak")) {
                         def workspace = pwd()
-                        abakus_version = sh(script: "git ls-remote --tags git@fp-abakus.github.com:navikt/fp-abakus.git | grep -o '[^\\/]*\$' | sort -t '_' -k 1 -g | tail -n 2 | head -1", returnStdout: true)?.trim();
+                        abakus_version = ABAKUS_HARDKODET_VERSJON // sh(script: "git ls-remote --tags git@fp-abakus.github.com:navikt/fp-abakus.git | grep -o '[^\\/]*\$' | sort -t '_' -k 1 -g | tail -n 2 | head -1", returnStdout: true)?.trim(); //TODO: FJERN DENNE
 
-                        echo "abakusversjon = ${dockerRegistry}/fpabakus:$abakus_version"
-                        sh "export ABAKUS_IMAGE=${dockerRegistry}/fpabakus:${abakus_version} &&" +
-                                "export VTP_IMAGE=${dockerRegistry}/vtp:${vtpVersjon} &&" +
+                        echo "abakusversjon = ${dockerRegistryAdeo}/fpabakus:$abakus_version"
+                        sh "export ABAKUS_IMAGE=${dockerRegistryGitHub}/fp-abakus:${abakus_version} &&" +
+                                "export VTP_IMAGE=${dockerRegistryAdeo}/vtp:${vtpVersjon} &&" +
                                 "export WORKSPACE=${workspace} &&" +
                                 "docker-compose -f $workspace/resources/pipeline/fpsak-docker-compose.yml up -d"
                     }
@@ -144,9 +149,9 @@ def call(body) {
 
                     //TODO: Gjør denne generisk
                     if(applikasjon.equalsIgnoreCase("fpsak")){
-                        sh "docker run -d --name $applikasjon --add-host=host.docker.internal:${host_ip} -v $workspace/.modig:/var/run/secrets/naisd.io/ --env-file sut.env  --env-file $workspace/resources/pipeline/autotest.list --env-file $workspace/resources/pipeline/" + params.applikasjon + "_datasource.list -p 8080:8080 -p 8000:8000  --network=\"pipeline_autotestverk\" " + dockerRegistry + "/$applikasjon:$sutToRun"
+                        sh "docker run -d --name $applikasjon --add-host=host.docker.internal:${host_ip} -v $workspace/.modig:/var/run/secrets/naisd.io/ --env-file sut.env  --env-file $workspace/resources/pipeline/autotest.list --env-file $workspace/resources/pipeline/" + params.applikasjon + "_datasource.list -p 8080:8080 -p 8000:8000  --network=\"pipeline_autotestverk\" " + dockerRegistryAdeo + "/$applikasjon:$sutToRun"
                     } else {
-                        sh "docker run -d --name $applikasjon --add-host=host.docker.internal:${host_ip} -v $workspace/.modig:/var/run/secrets/naisd.io/ --env-file sut.env  --env-file $workspace/resources/pipeline/autotest.list --env-file $workspace/resources/pipeline/" + params.applikasjon + "_datasource.list -p 8080:8080 -p 8000:8000 --link vtp:vtp " + dockerRegistry + "/$applikasjon:$sutToRun"
+                        sh "docker run -d --name $applikasjon --add-host=host.docker.internal:${host_ip} -v $workspace/.modig:/var/run/secrets/naisd.io/ --env-file sut.env  --env-file $workspace/resources/pipeline/autotest.list --env-file $workspace/resources/pipeline/" + params.applikasjon + "_datasource.list -p 8080:8080 -p 8000:8000 --link vtp:vtp " + dockerRegistryAdeo + "/$applikasjon:$sutToRun"
                     }
                 }
 
