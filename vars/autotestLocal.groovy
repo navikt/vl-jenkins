@@ -23,7 +23,6 @@ def call(body) {
     body()
 
     dockerRegistryGitHub = "docker.pkg.github.com/navikt"
-    ABAKUS_HARDKODET_VERSJON = "20191202162452-9332572"
 
     def selftestUrls = [fpsak: "/fpsak/internal/health/selftest", spberegning: "/spberegning/internal/selftest", fprisk: "/fprisk/internal/selftest"]
 
@@ -75,7 +74,6 @@ def call(body) {
                 String sutToRun = applikasjonVersjon
                 String dockerRegistryAdeo = "repo.adeo.no:5443"
                 String dockerRegistryGitHub = "docker.pkg.github.com/navikt"
-                String ABAKUS_HARDKODET_VERSJON = "20191202162452-9332572"
                 def vtpVersjon = "latest"
                 def autotestVersjon = "latest"
 
@@ -129,10 +127,7 @@ def call(body) {
                 stage("Start andre avhengigheter"){
                     if(applikasjon.equalsIgnoreCase("fpsak")) {
                         def workspace = pwd()
-                        abakus_version = ABAKUS_HARDKODET_VERSJON // sh(script: "git ls-remote --tags git@fp-abakus.github.com:navikt/fp-abakus.git | grep -o '[^\\/]*\$' | sort -t '_' -k 1 -g | tail -n 2 | head -1", returnStdout: true)?.trim(); //TODO: FJERN DENNE
-
-                        echo "abakusversjon = ${dockerRegistryAdeo}/fpabakus:$abakus_version"
-                        sh "export ABAKUS_IMAGE=${dockerRegistryGitHub}/fp-abakus/fpabakus:${abakus_version} &&" +
+                        sh "export ABAKUS_IMAGE=${dockerRegistryGitHub}/fp-abakus/fpabakus &&" +
                                 "export VTP_IMAGE=${dockerRegistryAdeo}/vtp:${vtpVersjon} &&" +
                                 "export WORKSPACE=${workspace} &&" +
                                 "docker-compose -f $workspace/resources/pipeline/fpsak-docker-compose.yml up -d"
