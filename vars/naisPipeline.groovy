@@ -113,7 +113,7 @@ def call() {
                                                   credentialsId   : 'gpr_token',
                                                   usernameVariable: 'GPR_USERNAME',
                                                   passwordVariable: 'GPR_PASSWORD']]) {
-                                    sh "docker login -u ${env.GPR_USERNAME} -p ${env.GPR_PASSWORD} ${dockerRegistryGitHub} && docker push ${dockerRegistryGitHub}/$ARTIFACTID/$ARTIFACTID:$version && docker tag ${dockerRegistryGitHub}/$ARTIFACTID/$ARTIFACTID:latest && docker push ${dockerRegistryGitHub}/$ARTIFACTID/$ARTIFACTID:latest"
+                                    sh "docker login -u ${env.GPR_USERNAME} -p ${env.GPR_PASSWORD} ${dockerRegistryGitHub} && docker push ${dockerRegistryGitHub}/$ARTIFACTID/$ARTIFACTID:$version && docker tag ${dockerRegistryGitHub}/$ARTIFACTID/$ARTIFACTID:$version ${dockerRegistryGitHub}/$ARTIFACTID/$ARTIFACTID:latest && docker push ${dockerRegistryGitHub}/$ARTIFACTID/$ARTIFACTID:latest"
 
 
                                 }
