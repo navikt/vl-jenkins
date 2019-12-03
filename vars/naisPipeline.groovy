@@ -29,6 +29,7 @@ def call() {
                         MILJO = params.miljo
                         Date date = new Date()
                         dockerRegistryIapp = "repo.adeo.no:5443"
+                        dockerRegistryGitHub = "docker.pkg.github.com/navikt"
 
                         checkout scm
                         gitCommitHasdh = sh(script: "git log -n 1 --pretty=format:'%h'", returnStdout: true)
@@ -75,10 +76,10 @@ def call() {
                             }
 
                             if (ARTIFACTID == 'fpsak') {
-                              String branchNavn = org.apache.commons.lang.RandomStringUtils.random(5, true, true)
-                              String schemaNavnFPSAK = "fpsak_unit_" + branchNavn
-                              String schemaNavnFPSAK_HIST = "fpsak_hist_unit_" + branchNavn
-                              mavenCommand +=  " -Dflyway.placeholders.vl_fpsak_hist_schema_unit=$schemaNavnFPSAK_HIST -Dflyway.placeholders.vl_fpsak_hist_schema_unit=$schemaNavnFPSAK_HIST "
+                                String branchNavn = org.apache.commons.lang.RandomStringUtils.random(5, true, true)
+                                String schemaNavnFPSAK = "fpsak_unit_" + branchNavn
+                                String schemaNavnFPSAK_HIST = "fpsak_hist_unit_" + branchNavn
+                                mavenCommand += " -Dflyway.placeholders.vl_fpsak_hist_schema_unit=$schemaNavnFPSAK_HIST -Dflyway.placeholders.vl_fpsak_hist_schema_unit=$schemaNavnFPSAK_HIST "
                             }
                             if (ARTIFACTID == 'fpinfo') {
                                 String rnd = org.apache.commons.lang.RandomStringUtils.random(5, true, true)
@@ -87,21 +88,34 @@ def call() {
                                 sh "mvn versions:use-latest-releases -Dincludes=no.nav.foreldrepenger:migreringer -DprocessDependencies=false"
                             }
 
-                            sh "${mavenCommand}"
-                            sh "docker build --pull -t $dockerRegistryIapp/$ARTIFACTID:$version ."
-                            withCredentials([[$class          : 'UsernamePasswordMultiBinding',
-                                              credentialsId   : 'nexusUser',
-                                              usernameVariable: 'NEXUS_USERNAME',
-                                              passwordVariable: 'NEXUS_PASSWORD']]) {
-                                sh "docker login -u ${env.NEXUS_USERNAME} -p ${env.NEXUS_PASSWORD} ${dockerRegistryIapp} && docker push ${dockerRegistryIapp}/${ARTIFACTID}:${version}"
+                            if (ARTIFACTID != 'vtp') {
+                                sh "${mavenCommand}"
+                                sh "docker build --pull -t $dockerRegistryIapp/$ARTIFACTID:$version ."
+                                withCredentials([[$class          : 'UsernamePasswordMultiBinding',
+                                                  credentialsId   : 'nexusUser',
+                                                  usernameVariable: 'NEXUS_USERNAME',
+                                                  passwordVariable: 'NEXUS_PASSWORD']]) {
+                                    sh "docker login -u ${env.NEXUS_USERNAME} -p ${env.NEXUS_PASSWORD} ${dockerRegistryIapp} && docker push ${dockerRegistryIapp}/${ARTIFACTID}:${version}"
 
-                                if (uploadToNais.contains(ARTIFACTID.toLowerCase())) {
-                                    sh "nais upload -u ${env.NEXUS_USERNAME} -p ${env.NEXUS_PASSWORD} -a ${ARTIFACTID} -v ${version}"
+                                    if (uploadToNais.contains(ARTIFACTID.toLowerCase())) {
+                                        sh "nais upload -u ${env.NEXUS_USERNAME} -p ${env.NEXUS_PASSWORD} -a ${ARTIFACTID} -v ${version}"
+                                    }
+
+                                    if (ARTIFACTID == 'fpsak') {
+                                        echo "-------------Deploy migreringene og regellmodell til Nexus -------------"
+                                        sh "mvn -B -DinstallAtEnd=true -DdeployAtEnd=true -Dsha1= -Dchangelist= -Drevision=$version -pl migreringer,:folketrygdloven-beregningsgrunnlag-regelmodell -DskipITs -DskipUTs -Dmaven.test.skip deploy -DdeployOnly"
+                                    }
                                 }
+                            } else if (ARTIFACTID == 'vtp') {
+                                sh "${mavenCommand}"
+                                sh "docker build --pull -t $dockerRegistryGitHub/$ARTIFACTID/$ARTIFACTID:$version ."
+                                withCredentials([[$class          : 'UsernamePasswordMultiBinding',
+                                                  credentialsId   : 'gpr_token',
+                                                  usernameVariable: 'GPR_USERNAME',
+                                                  passwordVariable: 'GPR_PASSWORD']]) {
+                                    sh "docker login -u ${env.GPR_USERNAME} -p ${env.GPR_PASSWORD} ${dockerRegistryGitHub} && docker push ${dockerRegistryGitHub}/$ARTIFACTID/$ARTIFACTID:$version && docker tag ${dockerRegistryGitHub}/$ARTIFACTID/$ARTIFACTID:latest && docker push ${dockerRegistryGitHub}/$ARTIFACTID/$ARTIFACTID:latest"
 
-                                if (ARTIFACTID == 'fpsak') {
-                                    echo "-------------Deploy migreringene og regellmodell til Nexus -------------"
-                                    sh "mvn -B -DinstallAtEnd=true -DdeployAtEnd=true -Dsha1= -Dchangelist= -Drevision=$version -pl migreringer,:folketrygdloven-beregningsgrunnlag-regelmodell -DskipITs -DskipUTs -Dmaven.test.skip deploy -DdeployOnly"
+
                                 }
                             }
                         }
@@ -151,9 +165,9 @@ def call() {
                         def buildEnvironment = new buildEnvironment()
                         def changes = buildEnvironment.makeCommitLogString(currentBuild.rawBuild.changeSets)
                         build job: 'Foreldrepenger/autotest-dispatcher', parameters: [
-                                [$class: 'StringParameterValue', name:  'application', value: "${ARTIFACTID}"],
-                                [$class: 'StringParameterValue', name:  'version', value: "${version}"],
-                                [$class: 'StringParameterValue', name:  'changelog', value: "${changes}"]
+                                [$class: 'StringParameterValue', name: 'application', value: "${ARTIFACTID}"],
+                                [$class: 'StringParameterValue', name: 'version', value: "${version}"],
+                                [$class: 'StringParameterValue', name: 'changelog', value: "${changes}"]
                         ], wait: false
                     }
                 }
@@ -198,7 +212,7 @@ def call() {
                                 }
                                 slackInfo(msgColor, "_Deploy av $ARTIFACTID:$version til $MILJO var vellykket._")
                             }
-                        } else if (ARTIFACTID == 'vtp'){
+                        } else if (ARTIFACTID == 'vtp') {
                             echo "$ARTIFACTID deployes ikke til miljøene"
                         } else {
                             if (ARTIFACTID == 'fpinfo' && MILJO == "t4") {
@@ -216,7 +230,7 @@ def call() {
 }
 
 def slackError(String tilleggsinfo) {
-    slackSend color: "danger", channel: "#foreldrepenger-ci",  message: "${env.JOB_NAME} [${env.BUILD_NUMBER}] feilet: ${env.BUILD_URL} ${tilleggsinfo}"
+    slackSend color: "danger", channel: "#foreldrepenger-ci", message: "${env.JOB_NAME} [${env.BUILD_NUMBER}] feilet: ${env.BUILD_URL} ${tilleggsinfo}"
 }
 
 def slackInfo(String msg) {
