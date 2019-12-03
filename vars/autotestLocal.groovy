@@ -114,17 +114,12 @@ def call(body) {
                     sh 'docker rm $(docker ps -a -q) || true'
                 }
 
-                stage("Pull") {
-                    sh "docker pull $dockerRegistryAdeo/$applikasjon:$params.applikasjonVersjon"
-                    sh "docker pull $dockerRegistryAdeo/vtp:$vtpVersjon"
-                }
-
                 stage("Setup keystores") {
                     keystores.generateKeystoreAndTruststore("vtp")
                 }
 
                 //TODO: Gjør denne generisk
-                stage("Start andre avhengigheter") {
+                stage("Start docker-compose avhengigheter") {
                     if (applikasjon.equalsIgnoreCase("fpsak")) {
                         withCredentials([[$class          : 'UsernamePasswordMultiBinding',
                                           credentialsId   : 'gpr_token',
@@ -133,7 +128,7 @@ def call(body) {
                             sh "docker login -u ${env.GPR_USERNAME} -p ${env.GPR_PASSWORD} ${dockerRegistryGitHub}"
                             def workspace = pwd()
                             sh "export ABAKUS_IMAGE=${dockerRegistryGitHub}/fp-abakus/fpabakus &&" +
-                                    "export VTP_IMAGE=${dockerRegistryAdeo}/vtp:${vtpVersjon} &&" +
+                                    "export VTP_IMAGE=${dockerRegistryGitHub}/vtp/vtp &&" +
                                     "export WORKSPACE=${workspace} &&" +
                                     "docker-compose -f $workspace/resources/pipeline/fpsak-docker-compose.yml up -d"
                         }
@@ -148,12 +143,7 @@ def call(body) {
                     def host_ip = sh(script: "host a01apvl00312.adeo.no | sed 's/.*.\\s//'", returnStdout: true).trim()
                     println "Host: " + host_ip
 
-                    //TODO: Gjør denne generisk
-                    if (applikasjon.equalsIgnoreCase("fpsak")) {
-                        sh "docker run -d --name $applikasjon --add-host=host.docker.internal:${host_ip} -v $workspace/.modig:/var/run/secrets/naisd.io/ --env-file sut.env  --env-file $workspace/resources/pipeline/autotest.list --env-file $workspace/resources/pipeline/" + params.applikasjon + "_datasource.list -p 8080:8080 -p 8000:8000  --network=\"pipeline_autotestverk\" " + dockerRegistryAdeo + "/$applikasjon:$sutToRun"
-                    } else {
-                        sh "docker run -d --name $applikasjon --add-host=host.docker.internal:${host_ip} -v $workspace/.modig:/var/run/secrets/naisd.io/ --env-file sut.env  --env-file $workspace/resources/pipeline/autotest.list --env-file $workspace/resources/pipeline/" + params.applikasjon + "_datasource.list -p 8080:8080 -p 8000:8000 --link vtp:vtp " + dockerRegistryAdeo + "/$applikasjon:$sutToRun"
-                    }
+                    sh "docker run -d --name $applikasjon --add-host=host.docker.internal:${host_ip} -v $workspace/.modig:/var/run/secrets/naisd.io/ --env-file sut.env  --env-file $workspace/resources/pipeline/autotest.list --env-file $workspace/resources/pipeline/" + params.applikasjon + "_datasource.list -p 8080:8080 -p 8000:8000  --network=\"pipeline_autotestverk\" " + dockerRegistryAdeo + "/$applikasjon:$sutToRun"
                 }
 
                 stage("Verifiserer VTP") {
