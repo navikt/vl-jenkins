@@ -19,7 +19,7 @@ def makeTestStatus(currentBuild, allureUrl) {
     return testStatus
 }
 
-def call() {
+def call(body) {
     def selftestUrls = [fpsak: "/fpsak/internal/health/selftest", spberegning: "/spberegning/internal/selftest", fprisk: "/fprisk/internal/selftest"]
     def vtpVersjon = "latest"
     def autotestVersjon = "latest"

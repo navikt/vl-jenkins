@@ -124,13 +124,19 @@ def call(body) {
                 }
 
                 //TODO: Gjør denne generisk
-                stage("Start andre avhengigheter"){
-                    if(applikasjon.equalsIgnoreCase("fpsak")) {
-                        def workspace = pwd()
-                        sh "export ABAKUS_IMAGE=${dockerRegistryGitHub}/fp-abakus/fpabakus &&" +
-                                "export VTP_IMAGE=${dockerRegistryAdeo}/vtp:${vtpVersjon} &&" +
-                                "export WORKSPACE=${workspace} &&" +
-                                "docker-compose -f $workspace/resources/pipeline/fpsak-docker-compose.yml up -d"
+                stage("Start andre avhengigheter") {
+                    if (applikasjon.equalsIgnoreCase("fpsak")) {
+                        withCredentials([[$class          : 'UsernamePasswordMultiBinding',
+                                          credentialsId   : 'gpr_token',
+                                          usernameVariable: 'GPR_USERNAME',
+                                          passwordVariable: 'GPR_PASSWORD']]) {
+                            sh "docker login -u ${env.GPR_USERNAME} -p ${env.GPR_PASSWORD} ${dockerRegistryGitHub}"
+                            def workspace = pwd()
+                            sh "export ABAKUS_IMAGE=${dockerRegistryGitHub}/fp-abakus/fpabakus &&" +
+                                    "export VTP_IMAGE=${dockerRegistryAdeo}/vtp:${vtpVersjon} &&" +
+                                    "export WORKSPACE=${workspace} &&" +
+                                    "docker-compose -f $workspace/resources/pipeline/fpsak-docker-compose.yml up -d"
+                        }
                     }
                 }
 
@@ -143,7 +149,7 @@ def call(body) {
                     println "Host: " + host_ip
 
                     //TODO: Gjør denne generisk
-                    if(applikasjon.equalsIgnoreCase("fpsak")){
+                    if (applikasjon.equalsIgnoreCase("fpsak")) {
                         sh "docker run -d --name $applikasjon --add-host=host.docker.internal:${host_ip} -v $workspace/.modig:/var/run/secrets/naisd.io/ --env-file sut.env  --env-file $workspace/resources/pipeline/autotest.list --env-file $workspace/resources/pipeline/" + params.applikasjon + "_datasource.list -p 8080:8080 -p 8000:8000  --network=\"pipeline_autotestverk\" " + dockerRegistryAdeo + "/$applikasjon:$sutToRun"
                     } else {
                         sh "docker run -d --name $applikasjon --add-host=host.docker.internal:${host_ip} -v $workspace/.modig:/var/run/secrets/naisd.io/ --env-file sut.env  --env-file $workspace/resources/pipeline/autotest.list --env-file $workspace/resources/pipeline/" + params.applikasjon + "_datasource.list -p 8080:8080 -p 8000:8000 --link vtp:vtp " + dockerRegistryAdeo + "/$applikasjon:$sutToRun"
@@ -265,7 +271,7 @@ def call(body) {
             } catch (Exception e) {
                 println("Bygg feilet: $e")
                 println(e.getMessage())
-                slackSend(color: "#FF0000", channel: "vtp-autotest-resultat", message: "Noe gikk feil - Autotest feilet uten testkjøring (" + applikasjon + " [" + applikasjonVersjon + "]) "+ e.getMessage())
+                slackSend(color: "#FF0000", channel: "vtp-autotest-resultat", message: "Noe gikk feil - Autotest feilet uten testkjøring (" + applikasjon + " [" + applikasjonVersjon + "]) " + e.getMessage())
                 currentBuild.result = 'FAILURE'
             } finally {
                 //TODO: Må endres når vi skal kjøre i parallell

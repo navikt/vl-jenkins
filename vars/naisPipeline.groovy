@@ -80,10 +80,6 @@ def call() {
                               String schemaNavnFPSAK_HIST = "fpsak_hist_unit_" + branchNavn
                               mavenCommand +=  " -Dflyway.placeholders.vl_fpsak_hist_schema_unit=$schemaNavnFPSAK_HIST -Dflyway.placeholders.vl_fpsak_hist_schema_unit=$schemaNavnFPSAK_HIST "
                             }
-                            if (ARTIFACTID.equalsIgnoreCase("fpmock2")) {
-                                echo("MVN deploy for fpmock2")
-                                mavenCommand += " deploy"
-                            }
                             if (ARTIFACTID == 'fpinfo') {
                                 String rnd = org.apache.commons.lang.RandomStringUtils.random(5, true, true)
                                 additionalMavenArgs = " -Dflyway.placeholders.fpinfo.fpsak.schema.navn=fpsak_$rnd -Dflyway.placeholders.fpinfoschema.schema.navn=fpinfoschema_$rnd -Dflyway.placeholders.fpinfo.schema.navn=fpinfo_$rnd "
