@@ -93,7 +93,7 @@ def call() {
                         echo "-------------SchemaNavn: $branchNavn -------------"
 
                         configFileProvider(
-                                [configFile(fileId: 'navMavenSettings', variable: 'MAVEN_SETTINGS')]) {
+                                [configFile(fileId: 'navMavenSettingsPkg', variable: 'MAVEN_SETTINGS')]) {
 
                             env.MAVEN_OPTS = "-Xms256m -Xmx512m"
                             String mavenProperties = maven.properties()
