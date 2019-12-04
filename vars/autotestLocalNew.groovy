@@ -137,12 +137,7 @@ def call() {
                         def host_ip = sh(script: "host a01apvl00312.adeo.no | sed 's/.*.\\s//'", returnStdout: true).trim()
                         println "Host: " + host_ip
 
-                        //TODO: Gjør denne generisk
-                        if(applikasjon.equalsIgnoreCase("fpsak")){
-                            sh(script: "docker run -d --name $applikasjon --add-host=host.docker.internal:${host_ip} -v $workspace/.modig:/var/run/secrets/naisd.io/ --env-file sut.env  --env-file $workspace/resources/pipeline/autotest.list --env-file $workspace/resources/pipeline/${applikasjon}_datasource.list -p 8080:8080 -p 8000:8000  --network=\"pipeline_autotestverk\" $DOCKERREGISTRY_ADEO/$applikasjon:$sutToRun")
-                        } else {
-                            sh(script: "docker run -d --name $applikasjon --add-host=host.docker.internal:${host_ip} -v $workspace/.modig:/var/run/secrets/naisd.io/ --env-file sut.env  --env-file $workspace/resources/pipeline/autotest.list --env-file $workspace/resources/pipeline/${applikasjon}_datasource.list -p 8080:8080 -p 8000:8000 --link vtp:vtp $DOCKERREGISTRY_ADEO/$applikasjon:$sutToRun")
-                        }
+                        sh(script: "docker run -d --name $applikasjon --add-host=host.docker.internal:${host_ip} -v $workspace/.modig:/var/run/secrets/naisd.io/ --env-file sut.env  --env-file $workspace/resources/pipeline/autotest.list --env-file $workspace/resources/pipeline/${applikasjon}_datasource.list -p 8080:8080 -p 8000:8000  --network=\"pipeline_autotestverk\" $DOCKERREGISTRY_ADEO/$applikasjon:$sutToRun")
                     }
                 }
             }
