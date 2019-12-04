@@ -19,7 +19,7 @@ def makeTestStatus(currentBuild, allureUrl) {
     return testStatus
 }
 
-def call(body) {
+def call() {
     def selftestUrls = [fpsak: "/fpsak/internal/health/selftest", spberegning: "/spberegning/internal/selftest", fprisk: "/fprisk/internal/selftest"]
     def vtpVersjon = "latest"
     def autotestVersjon = "latest"
@@ -48,7 +48,7 @@ def call(body) {
             timestamps()
         }
         environment {
-            DOCKERREGISTRY = "repo.adeo.no:5443"
+            DOCKERREGISTRY_ADEO = "repo.adeo.no:5443"
             DOCKERREGISTRY_GITHUB = "docker.pkg.github.com/navikt"
             ARTIFACTID = readMavenPom().getArtifactId()
             LANG = "nb_NO.UTF-8"
@@ -58,11 +58,6 @@ def call(body) {
             stage("Init") {
                 steps {
                     script {
-                        applikasjon = "fpsak"
-                        applikasjonVersjon = "3.1.0_20191202092119_00d79d5"
-                        sutToRun = applikasjonVersjon
-                        changelog = "TESTING TESTING"
-
                         if (params.profil == "") {
                             echo "Ingen testprofil oppgitt, setter til default samme som applikasjonsnavn: " + applikasjon
                             profil = applikasjon
@@ -102,27 +97,6 @@ def call(body) {
                 }
             }
 
-            stage("Pull") {
-                steps {
-                    script {
-                        sh(script: "docker pull $DOCKERREGISTRY/$applikasjon:$applikasjonVersjon")
-                        sh(script: "docker pull $DOCKERREGISTRY/vtp:$vtpVersjon")
-                    }
-                }
-            }
-
-            //TODO: Fjern eller implementer
-            stage("Clean db") {
-                when {
-                    expression { params.clean == true }
-                }
-                steps{
-                    script {
-                        println("Implementasjon for å renske databasen. IKKE IMPLEMENTERT.")
-                    }
-                }
-            }
-
             stage("Setup keystores") {
                 steps {
                     script {
@@ -131,19 +105,20 @@ def call(body) {
                 }
             }
 
-            //TODO: Gjør denne generisk
-            stage("Start andre avhengigheter") {
+            stage("Start docker-compose avhengigheter") {
                 steps {
                     script {
-                        if(applikasjon.equalsIgnoreCase("fpsak")) {
-                            def workspace = pwd()
-                            abakus_version = sh(script: "git ls-remote --tags git@fp-abakus.github.com:navikt/fp-abakus.git | grep -o '[^\\/]*\$' | sort -t '_' -k 1 -g | tail -n 2 | head -1", returnStdout: true)?.trim();
-
-                            echo "abakusversjon = ${DOCKERREGISTRY_GITHUB}/fp-abakus/fpabakus:${abakus_version}"
-                            withMaven(mavenSettingsConfig: 'navMavenSettingsPkg'){
-                                sh(script:  "export ABAKUS_IMAGE=${DOCKERREGISTRY_GITHUB}/fp-abakus/fpabakus:${abakus_version} &&" +
-                                            "export VTP_IMAGE=${DOCKERREGISTRY}/vtp:${vtpVersjon} &&" +
+                        if (applikasjon.equalsIgnoreCase("fpsak")) {
+                            withCredentials([[$class          : 'UsernamePasswordMultiBinding',
+                                              credentialsId   : 'gpr_token',
+                                              usernameVariable: 'GPR_USERNAME',
+                                              passwordVariable: 'GPR_PASSWORD']]) {
+                                sh(script: "docker login -u ${env.GPR_USERNAME} -p ${env.GPR_PASSWORD} ${DOCKERREGISTRY_GITHUB}")
+                                def workspace = pwd()
+                                sh(script:  "export ABAKUS_IMAGE=${DOCKERREGISTRY_GITHUB}/fp-abakus/fpabakus &&" +
+                                            "export VTP_IMAGE=${DOCKERREGISTRY_GITHUB}/vtp/vtp &&" +
                                             "export WORKSPACE=${workspace} &&" +
+                                            "docker-compose -f ${workspace}/resources/pipeline/fpsak-docker-compose.yml pull -q &&" +
                                             "docker-compose -f ${workspace}/resources/pipeline/fpsak-docker-compose.yml up -d")
                             }
                         }
@@ -164,9 +139,9 @@ def call(body) {
 
                         //TODO: Gjør denne generisk
                         if(applikasjon.equalsIgnoreCase("fpsak")){
-                            sh(script: "docker run -d --name $applikasjon --add-host=host.docker.internal:${host_ip} -v $workspace/.modig:/var/run/secrets/naisd.io/ --env-file sut.env  --env-file $workspace/resources/pipeline/autotest.list --env-file $workspace/resources/pipeline/${applikasjon}_datasource.list -p 8080:8080 -p 8000:8000  --network=\"pipeline_autotestverk\" $DOCKERREGISTRY/$applikasjon:$sutToRun")
+                            sh(script: "docker run -d --name $applikasjon --add-host=host.docker.internal:${host_ip} -v $workspace/.modig:/var/run/secrets/naisd.io/ --env-file sut.env  --env-file $workspace/resources/pipeline/autotest.list --env-file $workspace/resources/pipeline/${applikasjon}_datasource.list -p 8080:8080 -p 8000:8000  --network=\"pipeline_autotestverk\" $DOCKERREGISTRY_ADEO/$applikasjon:$sutToRun")
                         } else {
-                            sh(script: "docker run -d --name $applikasjon --add-host=host.docker.internal:${host_ip} -v $workspace/.modig:/var/run/secrets/naisd.io/ --env-file sut.env  --env-file $workspace/resources/pipeline/autotest.list --env-file $workspace/resources/pipeline/${applikasjon}_datasource.list -p 8080:8080 -p 8000:8000 --link vtp:vtp $DOCKERREGISTRY/$applikasjon:$sutToRun")
+                            sh(script: "docker run -d --name $applikasjon --add-host=host.docker.internal:${host_ip} -v $workspace/.modig:/var/run/secrets/naisd.io/ --env-file sut.env  --env-file $workspace/resources/pipeline/autotest.list --env-file $workspace/resources/pipeline/${applikasjon}_datasource.list -p 8080:8080 -p 8000:8000 --link vtp:vtp $DOCKERREGISTRY_ADEO/$applikasjon:$sutToRun")
                         }
                     }
                 }
@@ -226,7 +201,7 @@ def call(body) {
                                 sh(script:  'export AUTOTEST_ENV=pipeline && ' +
                                             "export NO_NAV_MODIG_SECURITY_APPCERT_KEYSTORE=${workspace}/.modig/keystore.jks && " +
                                             'export NO_NAV_MODIG_SECURITY_APPCERT_PASSWORD=devillokeystore1234 && ' +
-                                            ' mvn test -s $MAVEN_SETTINGS -P ' + "foreldrepenger" + ' -DargLine="AUTOTEST_ENV=pipepipe"')
+                                            ' mvn test -s $MAVEN_SETTINGS -P ' + profil + ' -DargLine="AUTOTEST_ENV=pipepipe"')
                             }
 
                         } catch (error) {
@@ -325,7 +300,7 @@ def call(body) {
 }
 
 def infoSlack(String color, String channel, String msg){
+    //TODO: Må fjerne channel_hardkodet med channel før bruk. Sender til privat slack kanal.
     String channel_hardkodet = "vtp-test-test"
-    //TODO: Må fjerne channel_hardkodet og erstatte argumentet med channel før bruk.
     slackSend(color: color, channel: channel_hardkodet, message: msg)
 }
