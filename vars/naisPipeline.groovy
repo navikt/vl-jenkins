@@ -72,7 +72,7 @@ def call() {
                             mavenCommand = "mvn -B -Dfile.encoding=UTF-8 -DinstallAtEnd=true -DdeployAtEnd=true -Dsha1= -Dchangelist= -Drevision=$version -Djava.security.egd=file:///dev/urandom -DtrimStackTrace=false clean install"
                             if (ARTIFACTID.equalsIgnoreCase("vtp")) {
                                 echo("MVN deploy for vtp - DISABLED _ DISABLED _ DISABLED - fjernet p.g.a. feil - fixes ") //TODO: (OL): Fix
-                                //mavenCommand = mavenCommand + " deploy"
+                                mavenCommand = mavenCommand + " deploy"
                             }
 
                             if (ARTIFACTID == 'fpsak') {
