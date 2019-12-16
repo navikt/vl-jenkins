@@ -109,6 +109,7 @@ def call() {
                                 }
                             } else if (ARTIFACTID == 'vtp') {
                                 sh "${mavenCommand}"
+                                println("branch: ${ env.BRANCH_NAME }")
                                 if ("master".equalsIgnoreCase("${ env.BRANCH_NAME }")) {
                                     sh "docker build --pull -t $dockerRegistryGitHub/$ARTIFACTID/$ARTIFACTID:$version ."
                                     withCredentials([[$class          : 'UsernamePasswordMultiBinding',
