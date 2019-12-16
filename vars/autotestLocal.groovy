@@ -224,36 +224,22 @@ def call(body) {
                     def testStatus = makeTestStatus(currentBuild.rawBuild.getAction(AbstractTestResultAction.class), allureUrl)
                     println("Skal skrive status til kanal: " + testStatus)
 
-
-                    if (profil.equalsIgnoreCase("spberegning") || profil.equalsIgnoreCase('fpsak')) {
-                        if (currentBuild.result == 'FAILURE' || currentBuild.result == 'ABORTED') {
-                            if (rc == 'true' && applikasjon == 'fpsak') {
-                                slackSend(color: "#FF0000", channel: "fp-go-no-go", message: "VTP Autotest feilet for release-kandidat (" + applikasjon + " [" + applikasjonVersjon + "]). " + testStatus)
-                                println("RC: Logget feil til kanal")
-                            }
-
-                            if (applikasjon == 'spberegning' && rc == 'false') {
-                                slackSend(color: "#FF0000", channel: "spberegning-alerts", message: "VTP Autotest feilet (" + applikasjon + " [" + applikasjonVersjon + "]). " + testStatus + "\nEndringer:\n" + changelog)
-                                println("Master build: Logget feil til kanal for spberegning")
-                            }
-
-                            slackSend(color: "#FF0000", channel: "vtp-autotest-resultat", message: "VTP Autotest feilet (" + applikasjon + " [" + applikasjonVersjon + "]). " + testStatus + "\nEndringer:\n" + changelog)
-                            println("Master build: Logget feil til kanal")
-
-                        } else {
-                            if (rc == 'true' && applikasjon == 'fpsak') {
-                                slackSend(color: "#00FF00", channel: "fp-go-no-go", message: "VTP Autotest kjørt uten feil for release-kandidat (" + applikasjon + " [" + applikasjonVersjon + "]). " + testStatus)
-                                println("RC: Logget suksess til kanal")
-                            }
-
-                            if (applikasjon == 'spberegning' && rc == 'false') {
-                                slackSend(color: "#00FF00", channel: "spberegning-alerts", message: "VTP Autotest kjørt uten feil (" + applikasjon + " [" + applikasjonVersjon + "]). " + testStatus + "\nEndringer:\n" + changelog)
-                                println("Master build: Logget suksess til kanal for spberegning")
-                            }
-
-                            slackSend(color: "#00FF00", channel: "vtp-autotest-resultat", message: "VTP Autotest kjørt uten feil (" + applikasjon + " [" + applikasjonVersjon + "]). " + testStatus + "\nEndringer:\n" + changelog)
-                            println("Master build: Logget suksess til kanal")
+                    if (currentBuild.result == 'FAILURE' || currentBuild.result == 'ABORTED') {
+                        if (applikasjon == 'spberegning') {
+                            slackSend(color: "#FF0000", channel: "spberegning-alerts", message: "VTP Autotest feilet (" + applikasjon + " [" + applikasjonVersjon + "]). " + testStatus + "\nEndringer:\n" + changelog)
+                            println("Master build: Logget feil til kanal for spberegning")
                         }
+
+                        slackSend(color: "#FF0000", channel: "vtp-autotest-resultat", message: "VTP Autotest feilet (" + applikasjon + " [" + applikasjonVersjon + "]). " + testStatus + "\nEndringer:\n" + changelog)
+                        println("Master build: Logget feil til kanal")
+                    } else {
+                        if (applikasjon == 'spberegning') {
+                            slackSend(color: "#00FF00", channel: "spberegning-alerts", message: "VTP Autotest kjørt uten feil (" + applikasjon + " [" + applikasjonVersjon + "]). " + testStatus + "\nEndringer:\n" + changelog)
+                            println("Master build: Logget suksess til kanal for spberegning")
+                        }
+
+                        slackSend(color: "#00FF00", channel: "vtp-autotest-resultat", message: "VTP Autotest kjørt uten feil (" + applikasjon + " [" + applikasjonVersjon + "]). " + testStatus + "\nEndringer:\n" + changelog)
+                        println("Master build: Logget suksess til kanal")
                     }
                     testResultAction = null
                 }
