@@ -70,7 +70,7 @@ def call() {
                             echo("artifact: " + ARTIFACTID)
 
                             mavenCommand = "mvn -B -Dfile.encoding=UTF-8 -DinstallAtEnd=true -DdeployAtEnd=true -Dsha1= -Dchangelist= -Drevision=$version -Djava.security.egd=file:///dev/urandom -DtrimStackTrace=false clean install"
-                            
+
                             if (ARTIFACTID.equalsIgnoreCase("vtp")) {
                                 //echo("MVN deploy for vtp - DISABLED _ DISABLED _ DISABLED - fjernet p.g.a. feil - fixes ") //TODO: (OL): Fix
                                 mavenCommand = mavenCommand + " deploy"
@@ -109,13 +109,14 @@ def call() {
                                 }
                             } else if (ARTIFACTID == 'vtp') {
                                 sh "${mavenCommand}"
-                                sh "docker build --pull -t $dockerRegistryGitHub/$ARTIFACTID/$ARTIFACTID:$version ."
-                                withCredentials([[$class          : 'UsernamePasswordMultiBinding',
-                                                  credentialsId   : 'gpr_token',
-                                                  usernameVariable: 'GPR_USERNAME',
-                                                  passwordVariable: 'GPR_PASSWORD']]) {
-                                    sh "docker login -u ${env.GPR_USERNAME} -p ${env.GPR_PASSWORD} ${dockerRegistryGitHub} && docker push ${dockerRegistryGitHub}/$ARTIFACTID/$ARTIFACTID:$version && docker tag ${dockerRegistryGitHub}/$ARTIFACTID/$ARTIFACTID:$version ${dockerRegistryGitHub}/$ARTIFACTID/$ARTIFACTID:latest && docker push ${dockerRegistryGitHub}/$ARTIFACTID/$ARTIFACTID:latest"
-
+                                if ("master".equalsIgnoreCase("${ env.BRANCH_NAME }")) {
+                                    sh "docker build --pull -t $dockerRegistryGitHub/$ARTIFACTID/$ARTIFACTID:$version ."
+                                    withCredentials([[$class          : 'UsernamePasswordMultiBinding',
+                                                      credentialsId   : 'gpr_token',
+                                                      usernameVariable: 'GPR_USERNAME',
+                                                      passwordVariable: 'GPR_PASSWORD']]) {
+                                        sh "docker login -u ${env.GPR_USERNAME} -p ${env.GPR_PASSWORD} ${dockerRegistryGitHub} && docker push ${dockerRegistryGitHub}/$ARTIFACTID/$ARTIFACTID:$version && docker tag ${dockerRegistryGitHub}/$ARTIFACTID/$ARTIFACTID:$version ${dockerRegistryGitHub}/$ARTIFACTID/$ARTIFACTID:latest && docker push ${dockerRegistryGitHub}/$ARTIFACTID/$ARTIFACTID:latest"
+                                    }
 
                                 }
                             }
