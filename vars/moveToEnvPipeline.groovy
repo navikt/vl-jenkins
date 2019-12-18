@@ -8,6 +8,7 @@ def call () {
                           spberegning:      'git@spberegning.github.com:navikt/spberegning.git', 
                           fpabakus:         'git@fp-abakus.github.com:navikt/fp-abakus.git',
                           fpfordel:         'git@fpfordel.github.com:navikt/fpfordel.git',
+                          fpabonnent:       'git@fpabonnent.github.com:navikt/fpabonnent.git',
                           "fpsak-frontend": 'git@fpsak-frontend.github.com:navikt/fpsak-frontend.git']
         
     pipeline {
@@ -69,7 +70,7 @@ def call () {
                       steps {
                           script {
                               if (params.fpabonnent) {
-                                deployJira('fpabonnent', fromNs, toNs)
+                                deployk8('fpabonnent', fromNs, toNs, k8DeployGitURL.get('fpabonnent'))
                               }
                           }
                        }
