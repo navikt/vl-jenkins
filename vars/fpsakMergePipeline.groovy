@@ -70,7 +70,7 @@ def call() {
                         String sha = "_${timestamp}_${commitHash}"
                         String revision = maven.revision()
                         String version = revision + sha
-                        mvnVersionParams = "-Drevision=$revision -Dchangelist= -Dsha1=$sha"
+                        mvnVersionParams = "-Dmaven.wagon.http.pool=false -Drevision=$revision -Dchangelist= -Dsha1=$sha"
 
                         //String description = "<a href='${params.PULL_REQUEST_URL}'>${params.PULL_REQUEST_FROM_REPO_SLUG}-${params.PULL_REQUEST_FROM_BRANCH}-${params.PULL_REQUEST_ID}</a>"
                         //console.info(description)
