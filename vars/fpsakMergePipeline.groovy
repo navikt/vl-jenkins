@@ -94,7 +94,7 @@ def call() {
 
                         //configFileProvider(
                           //      [configFile(fileId: 'navMavenSettingsPkg', variable: 'MAVEN_SETTINGS')]) {
-                        withMaven(mavenSettingsConfig: 'navMavenSettingsPkg', maven: 'maven-3.6.2') {
+                        withMaven(mavenSettingsConfig: 'navMavenSettingsPkg') {
 
                             env.MAVEN_OPTS = "-Xms256m -Xmx512m"
                             String mavenProperties = maven.properties()
