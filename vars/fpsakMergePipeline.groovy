@@ -92,15 +92,16 @@ def call() {
 
                         echo "-------------SchemaNavn: $branchNavn -------------"
 
-                        configFileProvider(
-                                [configFile(fileId: 'navMavenSettingsPkg', variable: 'MAVEN_SETTINGS')]) {
+                        //configFileProvider(
+                          //      [configFile(fileId: 'navMavenSettingsPkg', variable: 'MAVEN_SETTINGS')]) {
+                        withMaven(mavenSettingsConfig: 'navMavenSettingsPkg', maven: 'maven-3.6.2') {
 
                             env.MAVEN_OPTS = "-Xms256m -Xmx512m"
                             String mavenProperties = maven.properties()
                             String flywayConig = " -Dflyway.placeholders.vl_${artifactId}_hist_schema_unit=$schemaNavnFPSAK_HIST -Dflyway.placeholders.vl_${artifactId}_schema_unit=$schemaNavnFPSAK"
 
                             sh "export APPDATA=web/klient/node/node_modules/npm/bin;" +
-                                    " mvn $mavenFlagg -B -s $MAVEN_SETTINGS $mavenProperties $mvnVersionParams $flywayConig" +
+                                    " mvn $mavenFlagg -B $mavenProperties $mvnVersionParams $flywayConig" +
                                     " clean install"
                         }
                     }
