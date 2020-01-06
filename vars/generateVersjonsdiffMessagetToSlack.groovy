@@ -90,6 +90,7 @@ def getAppVersion(context, ns, appl) {
     def version
     def dockerRegistryIapp = "repo.adeo.no:5443"
     def dockerRegistryNav = "navikt"
+    def githubPkgRegistry = "docker.pkg.github.com/navikt"
     
     sh "k config use-context $context"
 
@@ -97,7 +98,7 @@ def getAppVersion(context, ns, appl) {
        script: "k get pods -l app=${appl} -n${ns} -o jsonpath='{.items[*].spec.containers[*].image}'|tr -d '%'",
        returnStdout: true
     ).trim()
-    versions = contImages.replaceAll("$dockerRegistryIapp/$appl:", "").replaceAll("$dockerRegistryNav/$appl:", "").split()
+    versions = contImages.replaceAll("$dockerRegistryIapp/$appl:", "").replaceAll("$dockerRegistryNav/$appl:", "").replaceAll(/$githubPkgRegistry.*:/, "").split()
 
     if (versions) {
       versions = versions.toUnique()
