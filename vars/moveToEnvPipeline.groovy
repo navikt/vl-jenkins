@@ -1,16 +1,18 @@
 import no.nav.jenkins.*
 
 def call () {
-  
+
     def fromNs
     def toNs
-    def k8DeployGitURL = [fpformidling:     'git@fp-formidling.github.com:navikt/fp-formidling.git', 
-                          spberegning:      'git@spberegning.github.com:navikt/spberegning.git', 
+    def k8DeployGitURL = [fpformidling:     'git@fp-formidling.github.com:navikt/fp-formidling.git',
+                          spberegning:      'git@spberegning.github.com:navikt/spberegning.git',
                           fpabakus:         'git@fp-abakus.github.com:navikt/fp-abakus.git',
                           fpfordel:         'git@fpfordel.github.com:navikt/fpfordel.git',
+                          fpoppdrag:        'git@fpoppdrag.github.com:navikt/fpoppdrag.git'
+                          fptilbake:        'git@fptilbake.github.com:navikt/fptilbake.git'
                           fpabonnent:       'git@fpabonnent.github.com:navikt/fpabonnent.git',
                           "fpsak-frontend": 'git@fpsak-frontend.github.com:navikt/fpsak-frontend.git']
-        
+
     pipeline {
         agent {
             node { label 'MASTER' }
@@ -26,7 +28,6 @@ def call () {
 
             booleanParam(defaultValue: true, description: '', name: 'fpsak')
             booleanParam(defaultValue: true, description: '', name: 'fpabonnent')
-            booleanParam(defaultValue: true, description: '', name: 'fpfordel')
             booleanParam(defaultValue: true, description: '', name: 'fplos')
             booleanParam(defaultValue: false, description: '', name: 'fpoppdrag')
             booleanParam(defaultValue: false, description: '', name: 'fptilbake')
@@ -37,7 +38,7 @@ def call () {
             //booleanParam(defaultValue: false, description: '', name: 'fpsak-frontend')
             //booleanParam(defaultValue: true, description: '', name: 'fpabakus')
         }
-        
+
         stages {
             stage ('Init') {
               steps {
@@ -51,11 +52,11 @@ def call () {
                           return
                       }
                     }
-                }  
+                }
             }
             stage('Flytt') {
                 parallel  {
-                    stage('fpsak') { 
+                    stage('fpsak') {
                       agent any
                       steps {
                           script {
@@ -64,8 +65,8 @@ def call () {
                               }
                           }
                        }
-                    } 
-                    stage('fpabonnent') { 
+                    }
+                    stage('fpabonnent') {
                       agent any
                       steps {
                           script {
@@ -75,17 +76,7 @@ def call () {
                           }
                        }
                     }
-                    stage('fpfordel') { 
-                      agent any
-                      steps {
-                          script {
-                              if (params.fpfordel) {
-                                deployJira('fpfordel', fromNs, toNs)
-                              }
-                          }
-                       }
-                    }
-                    stage('fplos') { 
+                    stage('fplos') {
                       agent any
                       steps {
                           script {
@@ -95,17 +86,17 @@ def call () {
                           }
                        }
                     }
-                    stage('fpoppdrag') { 
+                    stage('fpoppdrag') {
                       agent any
                       steps {
                           script {
                               if (params.fpoppdrag) {
-                                deployJira('fpoppdrag', fromNs, toNs)
+                                deployk8('fpoppdrag', fromNs, toNs, k8DeployGitURL.get('fpoppdrag'))
                               }
                           }
                        }
                     }
-                    stage('fptilbake') { 
+                    stage('fptilbake') {
                       agent any
                       steps {
                           script {
@@ -115,7 +106,7 @@ def call () {
                           }
                        }
                     }
-                    stage('fprisk') { 
+                    stage('fprisk') {
                       agent any
                       steps {
                           script {
@@ -125,7 +116,7 @@ def call () {
                           }
                        }
                     }
-                    stage('fpinfo') { 
+                    stage('fpinfo') {
                       agent any
                       steps {
                           script {
@@ -135,7 +126,7 @@ def call () {
                           }
                        }
                     }
-                    stage('fpformidling') { 
+                    stage('fpformidling') {
                       agent any
                       steps {
                           script {
@@ -145,7 +136,7 @@ def call () {
                           }
                        }
                     }
-                    stage('spberegning') { 
+                    stage('spberegning') {
                       agent any
                       steps {
                           script {
@@ -171,7 +162,7 @@ def deployJira(String artifactId, String from, String to ) {
     }
 
       echo "Flytter $artifactId fra $from til $to"
-    
+
     def (version, msg) = nais.getAppVersion(context, from, artifactId)
 
     echo "version: $version"
@@ -198,9 +189,9 @@ def deployk8(String artifactId, String from, String to, String scmURL) {
     def context =  (from == "p") ? "prod-fss": "preprod-fss"
 
     echo "Flytter $artifactId fra $from til $to"
-    
+
     def (version, msg) = nais.getAppVersion(context, from, artifactId)
-    
+
     if (msg && msg.length() > 0) {
       msg = "Flytting av $artifactId fra $from til $to feilet!"
       echo "$msg ..."
@@ -226,15 +217,15 @@ def deployk8(String artifactId, String from, String to, String scmURL) {
 
                 def exitCode = sh returnStatus: true, script: "k rollout status -n${naisNamespace} deployment/${artifactId}"
                 echo "exit code is $exitCode"
-                
+
                 if (exitCode == 0) {
-                    slackMessage("_Deploy av $artifactId:$version til $to var vellykket._", msgColor) 
+                    slackMessage("_Deploy av $artifactId:$version til $to var vellykket._", msgColor)
                 }
-            }                        
+            }
         } else {
           error('Deploy av $artifactId feilet! Fant ikke katalogen k8s.')
         }
-    }    
+    }
 }
 
 def slackMessage(message, msgColor) {
