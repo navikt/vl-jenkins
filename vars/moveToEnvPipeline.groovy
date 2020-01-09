@@ -8,8 +8,8 @@ def call () {
                           spberegning:      'git@spberegning.github.com:navikt/spberegning.git',
                           fpabakus:         'git@fp-abakus.github.com:navikt/fp-abakus.git',
                           fpfordel:         'git@fpfordel.github.com:navikt/fpfordel.git',
-                          fpoppdrag:        'git@fpoppdrag.github.com:navikt/fpoppdrag.git'
-                          fptilbake:        'git@fptilbake.github.com:navikt/fptilbake.git'
+                          fpoppdrag:        'git@fpoppdrag.github.com:navikt/fpoppdrag.git',
+                          fptilbake:        'git@fptilbake.github.com:navikt/fptilbake.git',
                           fpabonnent:       'git@fpabonnent.github.com:navikt/fpabonnent.git',
                           "fpsak-frontend": 'git@fpsak-frontend.github.com:navikt/fpsak-frontend.git']
 
