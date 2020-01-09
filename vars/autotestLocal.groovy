@@ -180,7 +180,7 @@ def call(body) {
                 stage("Kjør test") {
 
                     try {
-                        configFileProvider([configFile(fileId: 'navMavenSettings', variable: 'MAVEN_SETTINGS')]) {
+                        configFileProvider([configFile(fileId: 'navMavenSettingsPkg', variable: 'MAVEN_SETTINGS')]) {
                             println "Workspace = " + workspace
 
                             sh(script: "export JAVAX_NET_SSL_TRUSTSTORE=${workspace}/.modig/truststore.jks")
