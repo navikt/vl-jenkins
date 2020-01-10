@@ -201,18 +201,6 @@ def call() {
                                 }
                                 def exitCode = sh returnStatus: true, script: "k rollout status -n${naisNamespace} deployment/${ARTIFACTID}"
                                 echo "exit code is $exitCode"
-
-                                if (exitCode == 0) {
-                                    def veraPayload = "{\"environment\": \"${MILJO}\",\"application\": \"${ARTIFACTID}\",\"version\": \"${version}\",\"deployedBy\": \"Jenkins\"}"
-                                    def response = httpRequest([
-                                            url                   : "https://vera.adeo.no/api/v1/deploylog",
-                                            consoleLogResponseBody: true,
-                                            contentType           : "APPLICATION_JSON",
-                                            httpMode              : "POST",
-                                            requestBody           : veraPayload,
-                                            ignoreSslErrors       : true
-                                    ])
-                                }
                                 slackInfo(msgColor, "_Deploy av $ARTIFACTID:$version til $MILJO var vellykket._")
                             }
                         } else if (ARTIFACTID == 'vtp') {
