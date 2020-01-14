@@ -8,6 +8,7 @@ def call () {
                           spberegning:      'git@spberegning.github.com:navikt/spberegning.git',
                           fpabakus:         'git@fp-abakus.github.com:navikt/fp-abakus.git',
                           fpfordel:         'git@fpfordel.github.com:navikt/fpfordel.git',
+                          fpsak:            'ssh://git@stash.adeo.no:7999/vedfp/vl-foreldrepenger.git',
                           fpoppdrag:        'git@fpoppdrag.github.com:navikt/fpoppdrag.git',
                           fptilbake:        'git@fptilbake.github.com:navikt/fptilbake.git',
                           fpabonnent:       'git@fpabonnent.github.com:navikt/fpabonnent.git',
@@ -61,7 +62,7 @@ def call () {
                       steps {
                           script {
                               if (params.fpsak) {
-                                deployJira('fpsak', fromNs, toNs)
+                                deployk8('fpsak', fromNs, toNs, k8DeployGitURL.get('fpsak'))
                               }
                           }
                        }
@@ -197,12 +198,17 @@ def deployk8(String artifactId, String from, String to, String scmURL) {
       echo "$msg ..."
       slackMessage(msg, msgColor)
     } else if (version && version.length() > 0 ) {
+        def credsId = '';
+        if (artifactId == "fpsak") {
+          credsId = 'ssh-jenkins-user'
+        }
+
         checkout([
-                           $class: 'GitSCM',
-                           branches: [[name: 'refs/heads/master']],
-                           doGenerateSubmoduleConfigurations: false,
-                           userRemoteConfigs: [[credentialsId: '', url: scmURL]]
-               ])
+          $class: 'GitSCM',
+          branches: [[name: 'refs/heads/master']],
+          doGenerateSubmoduleConfigurations: false,
+          userRemoteConfigs: [[credentialsId: credsId, url: scmURL]]
+          ])
 
         if (fileExists ('k8s')) {
             dir('k8s') {
