@@ -226,12 +226,18 @@ def deployk8(String artifactId, String from, String to, String scmURL) {
 
                 if (exitCode == 0) {
                     slackMessage("_Deploy av $artifactId:$version til $to var vellykket._", msgColor)
+                } else {
+                    slackError("_Deploy av $artifactId:$version til $to var feilet._")   
                 }
             }
         } else {
           error('Deploy av $artifactId feilet! Fant ikke katalogen k8s.')
         }
     }
+}
+
+def slackError(String tilleggsinfo) {
+    slackSend color: "danger", channel: "#foreldrepenger-ci",  message: "${env.JOB_NAME} [${env.BUILD_NUMBER}] feilet: ${env.BUILD_URL} ${tilleggsinfo}"
 }
 
 def slackMessage(message, msgColor) {
