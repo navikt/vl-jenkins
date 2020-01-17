@@ -5,9 +5,6 @@ def call () {
     def fromNs
     def toNs
     def k8DeployGitURL = [fpformidling:     'git@fp-formidling.github.com:navikt/fp-formidling.git',
-                          spberegning:      'git@spberegning.github.com:navikt/spberegning.git',
-                          fpabakus:         'git@fp-abakus.github.com:navikt/fp-abakus.git',
-                          fpfordel:         'git@fpfordel.github.com:navikt/fpfordel.git',
                           fpsak:            'ssh://git@stash.adeo.no:7999/vedfp/vl-foreldrepenger.git',
                           fpoppdrag:        'git@fpoppdrag.github.com:navikt/fpoppdrag.git',
                           fptilbake:        'git@fptilbake.github.com:navikt/fptilbake.git',
@@ -34,10 +31,7 @@ def call () {
             booleanParam(defaultValue: false, description: '', name: 'fptilbake')
             booleanParam(defaultValue: false, description: '', name: 'fprisk')
             booleanParam(defaultValue: false, description: '', name: 'fpinfo')
-            booleanParam(defaultValue: false, description: '', name: 'spberegning')
             booleanParam(defaultValue: false, description: '', name: 'fpformidling')
-            //booleanParam(defaultValue: false, description: '', name: 'fpsak-frontend')
-            //booleanParam(defaultValue: true, description: '', name: 'fpabakus')
         }
 
         stages {
@@ -133,16 +127,6 @@ def call () {
                           script {
                               if (params.fpformidling) {
                                 deployk8('fpformidling', fromNs, toNs, k8DeployGitURL.get('fpformidling'))
-                              }
-                          }
-                       }
-                    }
-                    stage('spberegning') {
-                      agent any
-                      steps {
-                          script {
-                              if (params.spberegning) {
-                                deployk8('spberegning', fromNs, toNs, k8DeployGitURL.get('spberegning'))
                               }
                           }
                        }
