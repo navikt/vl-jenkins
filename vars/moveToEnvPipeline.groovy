@@ -29,7 +29,7 @@ def call () {
 
             booleanParam(defaultValue: true, description: '', name: 'fpsak')
             booleanParam(defaultValue: true, description: '', name: 'fpabonnent')
-            booleanParam(defaultValue: true, description: '', name: 'fplos')
+            booleanParam(defaultValue: false, description: '', name: 'fplos')
             booleanParam(defaultValue: false, description: '', name: 'fpoppdrag')
             booleanParam(defaultValue: false, description: '', name: 'fptilbake')
             booleanParam(defaultValue: false, description: '', name: 'fprisk')
