@@ -8,6 +8,7 @@ def call () {
                           fpsak:            'ssh://git@stash.adeo.no:7999/vedfp/vl-foreldrepenger.git',
                           fpoppdrag:        'git@fpoppdrag.github.com:navikt/fpoppdrag.git',
                           fptilbake:        'git@fptilbake.github.com:navikt/fptilbake.git',
+                          fprisk:           'git@fprisk.github.com:navikt/fp-risk.git',
                           fpabonnent:       'git@fpabonnent.github.com:navikt/fpabonnent.git',
                           "fpsak-frontend": 'git@fpsak-frontend.github.com:navikt/fpsak-frontend.git']
 
@@ -106,7 +107,7 @@ def call () {
                       steps {
                           script {
                               if (params.fprisk) {
-                                deployJira('fprisk', fromNs, toNs)
+                                deployk8('fprisk', fromNs, toNs, k8DeployGitURL.get('fprisk'))
                               }
                           }
                        }
