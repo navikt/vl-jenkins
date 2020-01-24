@@ -10,7 +10,8 @@ def call () {
                           fptilbake:        'git@fptilbake.github.com:navikt/fptilbake.git',
                           fprisk:           'git@fprisk.github.com:navikt/fp-risk.git',
                           fpabonnent:       'git@fpabonnent.github.com:navikt/fpabonnent.git',
-                          "fpsak-frontend": 'git@fpsak-frontend.github.com:navikt/fpsak-frontend.git']
+                          "fpsak-frontend": 'git@fpsak-frontend.github.com:navikt/fpsak-frontend.git',
+                          testhub:          'git@testhub.github.com:navikt/testhub.git']
 
     pipeline {
         agent {
@@ -128,6 +129,16 @@ def call () {
                           script {
                               if (params.fpformidling) {
                                 deployk8('fpformidling', fromNs, toNs, k8DeployGitURL.get('fpformidling'))
+                              }
+                          }
+                       }
+                    }
+                    stage('testhub') {
+                      agent any
+                      steps {
+                          script {
+                              if (params.testhub) {
+                                deployk8('testhub', fromNs, toNs, k8DeployGitURL.get('testhub'))
                               }
                           }
                        }
