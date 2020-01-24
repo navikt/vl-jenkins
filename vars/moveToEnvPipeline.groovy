@@ -27,11 +27,9 @@ def call () {
 
             booleanParam(defaultValue: true, description: '', name: 'fpsak')
             booleanParam(defaultValue: true, description: '', name: 'fpabonnent')
-            booleanParam(defaultValue: false, description: '', name: 'fplos')
             booleanParam(defaultValue: false, description: '', name: 'fpoppdrag')
             booleanParam(defaultValue: false, description: '', name: 'fptilbake')
             booleanParam(defaultValue: false, description: '', name: 'fprisk')
-            booleanParam(defaultValue: false, description: '', name: 'fpinfo')
             booleanParam(defaultValue: false, description: '', name: 'fpformidling')
         }
 
@@ -108,16 +106,6 @@ def call () {
                           script {
                               if (params.fprisk) {
                                 deployk8('fprisk', fromNs, toNs, k8DeployGitURL.get('fprisk'))
-                              }
-                          }
-                       }
-                    }
-                    stage('fpinfo') {
-                      agent any
-                      steps {
-                          script {
-                              if (params.fpinfo) {
-                                deployJira('fpinfo', fromNs, toNs)
                               }
                           }
                        }
