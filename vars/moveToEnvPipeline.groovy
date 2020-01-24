@@ -34,6 +34,7 @@ def call () {
             booleanParam(defaultValue: false, description: '', name: 'fprisk')
             booleanParam(defaultValue: false, description: '', name: 'fpinfo')
             booleanParam(defaultValue: false, description: '', name: 'fpformidling')
+            booleanParam(defaultValue: false, description: '', name: 'testhub')
         }
 
         stages {
