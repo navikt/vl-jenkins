@@ -14,10 +14,6 @@ def call() {
 
         parameters {
             booleanParam(defaultValue: true, description: '', name: 'fpsak')
-            booleanParam(defaultValue: true, description: '', name: 'fpinfo')
-
-            booleanParam(defaultValue: true, description: '', name: 'fpfordel')
-            booleanParam(defaultValue: true, description: '', name: 'fplos')
             booleanParam(defaultValue: true, description: '', name: 'fpoppdrag')
             booleanParam(defaultValue: true, description: '', name: 'fptilbake')
             booleanParam(defaultValue: true, description: '', name: 'fpsak-frontend')
@@ -44,13 +40,10 @@ def call() {
                                           fpformidling:'fp-formidling',
                                           fpoppdrag:'fpoppdrag',
                                           fptilbake:'fptilbake',
-                                          fplos:'fplos',
                                           fpabakus:'fp-abakus',
-                                          fpabonnent:'fpabonnent',
-                                          fpfordel: 'fpfordel']
+                                          fpabonnent:'fpabonnent']
 
-                      def stashRepoApps = [fpsak:'vl-foreldrepenger',
-                                            fpinfo:'vl-fpinfo']
+                      def stashRepoApps = [fpsak:'vl-foreldrepenger']
 
                       def keys = params.keySet().sort() as List
                       for ( int i = 0; i < keys.size(); i++ ) {
