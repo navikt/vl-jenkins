@@ -97,7 +97,7 @@ def call () {
                       steps {
                           script {
                               if (params.fptilbake) {
-                                deployJira('fptilbake', fromNs, toNs)
+                                deployk8('fptilbake', fromNs, toNs, k8DeployGitURL.get('fptilbake'))
                               }
                           }
                        }
