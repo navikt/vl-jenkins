@@ -5,7 +5,6 @@ def call() {
     def fpgithub = new fpgithub()
     def version
     def githubRepoName
-    def uploadToNais = ['fplos', 'fpinfo', 'fptilbake', 'fprisk']
     def GIT_COMMIT_HASH_FULL
 
     pipeline {
@@ -97,10 +96,6 @@ def call() {
                                                   usernameVariable: 'NEXUS_USERNAME',
                                                   passwordVariable: 'NEXUS_PASSWORD']]) {
                                     sh "docker login -u ${env.NEXUS_USERNAME} -p ${env.NEXUS_PASSWORD} ${dockerRegistryIapp} && docker push ${dockerRegistryIapp}/${ARTIFACTID}:${version}"
-
-                                    if (uploadToNais.contains(ARTIFACTID.toLowerCase())) {
-                                        sh "nais upload -u ${env.NEXUS_USERNAME} -p ${env.NEXUS_PASSWORD} -a ${ARTIFACTID} -v ${version}"
-                                    }
 
                                     if (ARTIFACTID == 'fpsak') {
                                         echo "-------------Deploy migreringene og regellmodell til Nexus -------------"
