@@ -8,7 +8,6 @@ def call () {
                           fpsak:            'ssh://git@stash.adeo.no:7999/vedfp/vl-foreldrepenger.git',
                           fpoppdrag:        'git@fpoppdrag.github.com:navikt/fpoppdrag.git',
                           fptilbake:        'git@fptilbake.github.com:navikt/fptilbake.git',
-                          fprisk:           'git@fprisk.github.com:navikt/fp-risk.git',
                           fpabonnent:       'git@fpabonnent.github.com:navikt/fpabonnent.git',
                           "fpsak-frontend": 'git@fpsak-frontend.github.com:navikt/fpsak-frontend.git',
                           testhub:          'git@testhub.github.com:navikt/testhub.git']
@@ -31,7 +30,6 @@ def call () {
             booleanParam(defaultValue: false, description: '', name: 'fplos')
             booleanParam(defaultValue: false, description: '', name: 'fpoppdrag')
             booleanParam(defaultValue: false, description: '', name: 'fptilbake')
-            booleanParam(defaultValue: false, description: '', name: 'fprisk')
             booleanParam(defaultValue: false, description: '', name: 'fpinfo')
             booleanParam(defaultValue: false, description: '', name: 'fpformidling')
             booleanParam(defaultValue: false, description: '', name: 'testhub')
@@ -100,16 +98,6 @@ def call () {
                           script {
                               if (params.fptilbake) {
                                 deployk8('fptilbake', fromNs, toNs, k8DeployGitURL.get('fptilbake'))
-                              }
-                          }
-                       }
-                    }
-                    stage('fprisk') {
-                      agent any
-                      steps {
-                          script {
-                              if (params.fprisk) {
-                                deployk8('fprisk', fromNs, toNs, k8DeployGitURL.get('fprisk'))
                               }
                           }
                        }
