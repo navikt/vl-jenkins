@@ -58,7 +58,7 @@ def call() {
                     script {
                         def additionalMavenArgs = ""
                         //withMaven(mavenSettingsConfig: 'navMavenSettingsPkg') {
-                        withMaven(mavenSettingsConfig: 'navMavenSettingsPkg', maven: 'default-maven',) {
+                        withMaven(mavenSettingsConfig: 'navMavenSettingsPkg', maven: 'default-maven') {
                             buildEnvironment = new buildEnvironment()
                             buildEnvironment.setEnv()
                             if (maven.javaVersion() != null) {
