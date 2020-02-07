@@ -4,8 +4,7 @@ def call () {
 
     def fromNs
     def toNs
-    def k8DeployGitURL = [fpformidling:     'git@fp-formidling.github.com:navikt/fp-formidling.git',
-                          fpsak:            'ssh://git@stash.adeo.no:7999/vedfp/vl-foreldrepenger.git',
+    def k8DeployGitURL = [fpsak:            'ssh://git@stash.adeo.no:7999/vedfp/vl-foreldrepenger.git',
                           fpoppdrag:        'git@fpoppdrag.github.com:navikt/fpoppdrag.git',
                           fptilbake:        'git@fptilbake.github.com:navikt/fptilbake.git',
                           fpabonnent:       'git@fpabonnent.github.com:navikt/fpabonnent.git',
@@ -31,7 +30,6 @@ def call () {
             booleanParam(defaultValue: false, description: '', name: 'fpoppdrag')
             booleanParam(defaultValue: false, description: '', name: 'fptilbake')
             booleanParam(defaultValue: false, description: '', name: 'fpinfo')
-            booleanParam(defaultValue: false, description: '', name: 'fpformidling')
             booleanParam(defaultValue: false, description: '', name: 'testhub')
         }
 
@@ -108,16 +106,6 @@ def call () {
                           script {
                               if (params.fpinfo) {
                                 deployJira('fpinfo', fromNs, toNs)
-                              }
-                          }
-                       }
-                    }
-                    stage('fpformidling') {
-                      agent any
-                      steps {
-                          script {
-                              if (params.fpformidling) {
-                                deployk8('fpformidling', fromNs, toNs, k8DeployGitURL.get('fpformidling'))
                               }
                           }
                        }
