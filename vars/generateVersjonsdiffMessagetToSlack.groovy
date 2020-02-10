@@ -47,10 +47,12 @@ def call() {
                                           fplos:'fplos',
                                           fpabakus:'fp-abakus',
                                           fpabonnent:'fpabonnent',
-                                          fpfordel: 'fpfordel']
+                                          fpfordel: 'fpfordel',
+                                          fpsak: 'fp-sak',
+                                          fpinfo: 'fpinfo']
 
-                      def stashRepoApps = [fpsak:'vl-foreldrepenger',
-                                            fpinfo:'vl-fpinfo']
+                      def stashRepoApps = [fpsakx:'vl-foreldrepenger',
+                                            fpinfox:'vl-fpinfo']
 
                       def keys = params.keySet().sort() as List
                       for ( int i = 0; i < keys.size(); i++ ) {
