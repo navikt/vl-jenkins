@@ -123,16 +123,12 @@ def call() {
                 post {
                     success {
                         script {
-                            if (ARTIFACTID != 'fpinfo' && ARTIFACTID != 'fpsak') {
-                                fpgithub.updateBuildStatus(githubRepoName, "success", GIT_COMMIT_HASH_FULL)
-                            }
+                            fpgithub.updateBuildStatus(githubRepoName, "success", GIT_COMMIT_HASH_FULL)
                         }
                     }
                     failure {
                         script {
-                            if (ARTIFACTID != 'fpinfo' && ARTIFACTID != 'fpsak') {
-                                fpgithub.updateBuildStatus(githubRepoName, "failure", GIT_COMMIT_HASH_FULL)
-                            }
+                            fpgithub.updateBuildStatus(githubRepoName, "failure", GIT_COMMIT_HASH_FULL)
                         }
                     }
                 }
