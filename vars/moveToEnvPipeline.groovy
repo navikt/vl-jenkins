@@ -7,7 +7,6 @@ def call () {
     def k8DeployGitURL = [fpsak:            'ssh://git@stash.adeo.no:7999/vedfp/vl-foreldrepenger.git',
                           fpoppdrag:        'git@fpoppdrag.github.com:navikt/fpoppdrag.git',
                           fptilbake:        'git@fptilbake.github.com:navikt/fptilbake.git',
-                          fpabonnent:       'git@fpabonnent.github.com:navikt/fpabonnent.git',
                           "fpsak-frontend": 'git@fpsak-frontend.github.com:navikt/fpsak-frontend.git',
                           testhub:          'git@testhub.github.com:navikt/testhub.git']
 
@@ -25,11 +24,8 @@ def call () {
             string(defaultValue: '', description: '', name: 'TO_ENVIRONMENT')
 
             booleanParam(defaultValue: true, description: '', name: 'fpsak')
-            booleanParam(defaultValue: true, description: '', name: 'fpabonnent')
-            booleanParam(defaultValue: false, description: '', name: 'fplos')
             booleanParam(defaultValue: false, description: '', name: 'fpoppdrag')
             booleanParam(defaultValue: false, description: '', name: 'fptilbake')
-            booleanParam(defaultValue: false, description: '', name: 'fpinfo')
             booleanParam(defaultValue: false, description: '', name: 'testhub')
         }
 
@@ -60,26 +56,6 @@ def call () {
                           }
                        }
                     }
-                    stage('fpabonnent') {
-                      agent any
-                      steps {
-                          script {
-                              if (params.fpabonnent) {
-                                deployk8('fpabonnent', fromNs, toNs, k8DeployGitURL.get('fpabonnent'))
-                              }
-                          }
-                       }
-                    }
-                    stage('fplos') {
-                      agent any
-                      steps {
-                          script {
-                              if (params.fplos) {
-                                deployJira('fplos', fromNs, toNs)
-                              }
-                          }
-                       }
-                    }
                     stage('fpoppdrag') {
                       agent any
                       steps {
@@ -96,16 +72,6 @@ def call () {
                           script {
                               if (params.fptilbake) {
                                 deployk8('fptilbake', fromNs, toNs, k8DeployGitURL.get('fptilbake'))
-                              }
-                          }
-                       }
-                    }
-                    stage('fpinfo') {
-                      agent any
-                      steps {
-                          script {
-                              if (params.fpinfo) {
-                                deployJira('fpinfo', fromNs, toNs)
                               }
                           }
                        }
