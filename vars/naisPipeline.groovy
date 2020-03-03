@@ -57,7 +57,7 @@ def call() {
                 steps {
                     script {
                         def additionalMavenArgs = ""
-                        //withMaven(mavenSettingsConfig: 'navMavenSettingsPkg') {
+                        
                         withMaven(mavenSettingsConfig: 'navMavenSettingsPkg', maven: 'default-maven') {
                             buildEnvironment = new buildEnvironment()
                             buildEnvironment.setEnv()
@@ -71,50 +71,24 @@ def call() {
 
                             mavenCommand = "mvn -B -Dfile.encoding=UTF-8 -DinstallAtEnd=true -DdeployAtEnd=true -Dsha1= -Dchangelist= -Drevision=$version -Djava.security.egd=file:///dev/urandom -DtrimStackTrace=false clean install"
 
-                            if (ARTIFACTID.equalsIgnoreCase("vtp")) {
-                                //echo("MVN deploy for vtp - DISABLED _ DISABLED _ DISABLED - fjernet p.g.a. feil - fixes ") //TODO: (OL): Fix
-                                mavenCommand = mavenCommand + " deploy"
-                            }
-
                             if (ARTIFACTID == 'fpsak') {
                                 String branchNavn = org.apache.commons.lang.RandomStringUtils.random(5, true, true)
                                 String schemaNavnFPSAK = "fpsak_unit_" + branchNavn
                                 String schemaNavnFPSAK_HIST = "fpsak_hist_unit_" + branchNavn
                                 mavenCommand += " -Dflyway.placeholders.vl_fpsak_hist_schema_unit=$schemaNavnFPSAK_HIST -Dflyway.placeholders.vl_fpsak_hist_schema_unit=$schemaNavnFPSAK_HIST "
                             }
-                            if (ARTIFACTID == 'fpinfo') {
-                                String rnd = org.apache.commons.lang.RandomStringUtils.random(5, true, true)
-                                additionalMavenArgs = " -Dflyway.placeholders.fpinfo.fpsak.schema.navn=fpsak_$rnd -Dflyway.placeholders.fpinfoschema.schema.navn=fpinfoschema_$rnd -Dflyway.placeholders.fpinfo.schema.navn=fpinfo_$rnd "
-                                mavenCommand += additionalMavenArgs
-                                sh "mvn versions:use-latest-releases -Dincludes=no.nav.foreldrepenger:migreringer -DprocessDependencies=false"
-                            }
 
-                            if (ARTIFACTID != 'vtp') {
-                                sh "${mavenCommand}"
-                                sh "docker build --pull -t $dockerRegistryIapp/$ARTIFACTID:$version ."
-                                withCredentials([[$class          : 'UsernamePasswordMultiBinding',
-                                                  credentialsId   : 'nexusUser',
-                                                  usernameVariable: 'NEXUS_USERNAME',
-                                                  passwordVariable: 'NEXUS_PASSWORD']]) {
-                                    sh "docker login -u ${env.NEXUS_USERNAME} -p ${env.NEXUS_PASSWORD} ${dockerRegistryIapp} && docker push ${dockerRegistryIapp}/${ARTIFACTID}:${version}"
+                            sh "${mavenCommand}"
+                            sh "docker build --pull -t $dockerRegistryIapp/$ARTIFACTID:$version ."
+                            withCredentials([[$class          : 'UsernamePasswordMultiBinding',
+                                              credentialsId   : 'nexusUser',
+                                              usernameVariable: 'NEXUS_USERNAME',
+                                              passwordVariable: 'NEXUS_PASSWORD']]) {
+                                sh "docker login -u ${env.NEXUS_USERNAME} -p ${env.NEXUS_PASSWORD} ${dockerRegistryIapp} && docker push ${dockerRegistryIapp}/${ARTIFACTID}:${version}"
 
-                                    if (ARTIFACTID == 'fpsak') {
-                                        echo "-------------Deploy migreringene og regellmodell til Nexus -------------"
-                                        sh "mvn -B -DinstallAtEnd=true -DdeployAtEnd=true -Dsha1= -Dchangelist= -Drevision=$version -pl migreringer -DskipITs -DskipUTs -Dmaven.test.skip deploy -DdeployOnly"
-                                    }
-                                }
-                            } else if (ARTIFACTID == 'vtp') {
-                                sh "${mavenCommand}"
-                                println("branch: ${ env.BRANCH_NAME }")
-                                if ("master".equalsIgnoreCase("${ env.BRANCH_NAME }")) {
-                                    sh "docker build --pull -t $dockerRegistryGitHub/$ARTIFACTID/$ARTIFACTID:$version ."
-                                    withCredentials([[$class          : 'UsernamePasswordMultiBinding',
-                                                      credentialsId   : 'gpr_token',
-                                                      usernameVariable: 'GPR_USERNAME',
-                                                      passwordVariable: 'GPR_PASSWORD']]) {
-                                        sh "docker login -u ${env.GPR_USERNAME} -p ${env.GPR_PASSWORD} ${dockerRegistryGitHub} && docker push ${dockerRegistryGitHub}/$ARTIFACTID/$ARTIFACTID:$version && docker tag ${dockerRegistryGitHub}/$ARTIFACTID/$ARTIFACTID:$version ${dockerRegistryGitHub}/$ARTIFACTID/$ARTIFACTID:latest && docker push ${dockerRegistryGitHub}/$ARTIFACTID/$ARTIFACTID:latest"
-                                    }
-
+                                if (ARTIFACTID == 'fpsak') {
+                                    echo "-------------Deploy migreringene og regellmodell til Nexus -------------"
+                                    sh "mvn -B -DinstallAtEnd=true -DdeployAtEnd=true -Dsha1= -Dchangelist= -Drevision=$version -pl migreringer -DskipITs -DskipUTs -Dmaven.test.skip deploy -DdeployOnly"
                                 }
                             }
                         }
@@ -195,8 +169,6 @@ def call() {
                                 echo "exit code is $exitCode"
                                 slackInfo(msgColor, "_Deploy av $ARTIFACTID:$version til $MILJO var vellykket._")
                             }
-                        } else if (ARTIFACTID == 'vtp') {
-                            echo "$ARTIFACTID deployes ikke til miljøene"
                         } else {
                             if (ARTIFACTID == 'fpinfo' && MILJO == "t4") {
                                 MILJO = "q1"
