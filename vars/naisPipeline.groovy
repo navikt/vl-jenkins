@@ -85,10 +85,10 @@ def call() {
                                               usernameVariable: 'NEXUS_USERNAME',
                                               passwordVariable: 'NEXUS_PASSWORD']]) {
                                 sh "docker login -u ${env.NEXUS_USERNAME} -p ${env.NEXUS_PASSWORD} ${dockerRegistryIapp} && docker push ${dockerRegistryIapp}/${ARTIFACTID}:${version}"
-                                sh "docker build -f vtp/Dockerfile --pull --build-arg VERSION=$version -t ${dockerRegistryIapp}/${ARTIFACTID}-test:$version ."
-                                sh "docker push ${dockerRegistryIapp}/${ARTIFACTID}-test:$version"
-
                                 if (ARTIFACTID == 'fpsak') {
+                                    sh "docker build -f vtp/Dockerfile --pull --build-arg REPO=${dockerRegistryIapp}/${ARTIFACTID} --build-arg VERSION=$version -t ${dockerRegistryIapp}/${ARTIFACTID}-test:$version ."
+                                    sh "docker push ${dockerRegistryIapp}/${ARTIFACTID}-test:$version"
+
                                     echo "-------------Deploy migreringene og regellmodell til Nexus -------------"
                                     sh "mvn -B -DinstallAtEnd=true -DdeployAtEnd=true -Dsha1= -Dchangelist= -Drevision=$version -pl migreringer -DskipITs -DskipUTs -Dmaven.test.skip deploy -DdeployOnly"
                                 }
