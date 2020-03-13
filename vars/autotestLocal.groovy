@@ -86,10 +86,6 @@ def call(body) {
                     step([$class: 'WsCleanup'])
                     checkout scm
 
-                    vtpVersjon = sh(script: "git ls-remote --tags git@vtp.github.com:navikt/vtp.git | sort -t '/' -k 3 -V | tail -2 | head -1 | grep -o '[^\\/]*\$'", returnStdout: true)?.trim();
-
-
-
                     autotestVersjon = sh(script: "git rev-parse HEAD", returnStdout: true)?.trim();
                     println "Using VTP version '${vtpVersjon}'"
 
@@ -143,7 +139,7 @@ def call(body) {
                     def host_ip = sh(script: "host a01apvl00312.adeo.no | sed 's/.*.\\s//'", returnStdout: true).trim()
                     println "Host: " + host_ip
 
-                    sh "docker run -d --name $applikasjon --add-host=host.docker.internal:${host_ip} -v $workspace/.modig:/var/run/secrets/naisd.io/ --env-file sut.env  --env-file $workspace/resources/pipeline/autotest.list --env-file $workspace/resources/pipeline/" + params.applikasjon + "_datasource.list -p 8080:8080 -p 8000:8000  --network=\"pipeline_autotestverk\" " + dockerRegistryAdeo + "/$applikasjon-test:$sutToRun"
+                    sh "docker run -d --name $applikasjon --add-host=oracle:${host_ip} -v $workspace/.modig:/var/run/secrets/naisd.io/ --env-file sut.env  --env-file $workspace/resources/pipeline/autotest.list --env-file $workspace/resources/pipeline/" + params.applikasjon + "_datasource.list -p 8080:8080 -p 8000:8000  --network=\"pipeline_autotestverk\" " + dockerRegistryAdeo + "/$applikasjon-test:$sutToRun"
                 }
 
                 stage("Verifiserer VTP") {
