@@ -172,7 +172,7 @@ def call() {
                                 slackInfo(msgColor, "_Deploy av $ARTIFACTID:$version til $MILJO var vellykket._")
                             }
                         } else {
-                            if (ARTIFACTID == 'fpinfo' && MILJO == "t4") {
+                            if ((ARTIFACTID == 'fpinfo' || ARTIFACTID =='testhub') && MILJO == "t4") {
                                 MILJO = "q1"
                             }
                             echo "Jira deploy"
