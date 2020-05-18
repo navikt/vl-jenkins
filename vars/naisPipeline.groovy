@@ -175,9 +175,11 @@ def call() {
                             if (ARTIFACTID == 'fpinfo' && MILJO == "t4") {
                                 MILJO = "q1"
                             }
-                            echo "Jira deploy"
-                            jira = new jira()
-                            jira.deployNais(ARTIFACTID, version, MILJO)
+                            if (ARTIFACTID != 'fpsak'){
+                                echo "Jira deploy"
+                                jira = new jira()
+                                jira.deployNais(ARTIFACTID, version, MILJO)
+                            }
                         }
                     }
                 }
