@@ -122,7 +122,7 @@ def call(body) {
                                       passwordVariable: 'GPR_PASSWORD']]) {
                         sh "docker login -u ${env.GPR_USERNAME} -p ${env.GPR_PASSWORD} ${dockerRegistryGitHub}"
                         def workspace = pwd()
-                        sh "export ABAKUS_IMAGE=${dockerRegistryGitHub}/fp-abakus/fpabakus &&" +
+                        sh "export FPABAKUS_IMAGE=${dockerRegistryGitHub}/fp-abakus/fpabakus &&" +
                                 "export VTP_IMAGE=${dockerRegistryGitHub}/vtp/vtp &&" +
                                 "export WORKSPACE=${workspace} &&" +
                                 "docker-compose -f $workspace/resources/pipeline/fpsak-docker-compose.yml pull -q &&" +
